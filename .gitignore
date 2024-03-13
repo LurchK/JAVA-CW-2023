@@ -7,3 +7,6 @@ example-transcript.docx
 cw-db/.mvn/
 cw-db/databases/
 cw-db/target/
+/cw-db/.idea
+cw-db/startDBClient.bat
+cw-db/startDBServer.bat
