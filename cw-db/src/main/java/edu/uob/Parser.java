@@ -4,10 +4,10 @@ package edu.uob;
 import java.util.*;
 
 public class Parser {
-    int cTok;
-    int failTok;
-    String failMessage;
-    List<String> tokens;
+    private int cTok;
+    private int failTok;
+    private String failMessage;
+    private List<String> tokens;
 
     public Parser(List<String> tokens) {
         this.tokens = tokens;
@@ -15,15 +15,23 @@ public class Parser {
         failTok = 0;
     }
 
+    public String getFailMessage() {
+        return failMessage;
+    }
+
     public boolean parse() {
+        if(tokens.isEmpty()) {
+            failMessage = "Empty Command.";
+            return false;
+        }
         return command();
     }
 
-    private boolean fail(int bakTok, String str) {
+    private boolean parseFail(int bakTok, String str) {
         if(cTok >= failTok) {
             failTok = cTok;
             failMessage = "Invalid command. " +
-                    "Parser error around token number " + failTok + ": " +
+                    "Parser error around token with index " + failTok + ": " +
                     tokens.get(failTok) + ". " + str;
         }
         cTok = bakTok;
@@ -31,17 +39,22 @@ public class Parser {
     }
 
     private boolean command() {
+        if(!tokens.get(tokens.size()-1).equals(";")) {
+            cTok = tokens.size()-1;
+            return parseFail(cTok, "Not ; at the end of command.");
+        }
         if(!commandType()) {
             return false;
         }
 
         int bakTok = cTok;
         if(!tokens.get(cTok).equals(";")) {
-            return fail(bakTok, "Not ; at the end of a valid command.");
+            return parseFail(bakTok, "Not ; at the end of a valid command.");
         }
         cTok++;
+
         if(tokens.size() > cTok) {
-            return fail(bakTok, "Multiple ; token.");
+            return parseFail(bakTok, "Multiple ; token.");
         }
         return true;
     }
@@ -52,27 +65,36 @@ public class Parser {
                 update() || delete() || join()) {
             return true;
         }
-        return fail(bakTok, "Invalid CommandType.");
+        return parseFail(bakTok, "Invalid CommandType.");
     }
 
     private boolean use() {
         int bakTok = cTok;
         if(!tokens.get(cTok).equalsIgnoreCase("USE")) {
-            return fail(bakTok, "USE key word not found for Use.");
+            return parseFail(bakTok, "USE key word not found for Use.");
         }
         cTok++;
 
         if(!plainText()) {
-            return fail(bakTok, "Invalid PlainText for Use.");
+            return parseFail(bakTok, "Invalid PlainText for Use.");
         }
 
+        return true;
+    }
+
+    private boolean plainText() {
+        int bakTok = cTok;
+        if(!tokens.get(cTok).matches("^[a-zA-Z0-9]+$")) {
+            return parseFail(bakTok, "Not plaintext.");
+        }
+        cTok++;
         return true;
     }
     
     private boolean create() {
         int bakTok = cTok;
         if(!createDatabase() && !createTable()) {
-            return fail(bakTok, "Invalid Create.");
+            return parseFail(bakTok, "Invalid Create.");
         }
         return true;
     }
@@ -80,15 +102,15 @@ public class Parser {
     private boolean createDatabase() {
         int bakTok = cTok;
         if(!tokens.get(cTok).equalsIgnoreCase("CREATE")) {
-            return fail(bakTok, "CREATE key word not found for CreateDatabase.");
+            return parseFail(bakTok, "CREATE key word not found for CreateDatabase.");
         }
         cTok++;
         if(!tokens.get(cTok).equalsIgnoreCase("DATABASE")) {
-            return fail(bakTok, "DATABASE key word not found for CreateDatabase.");
+            return parseFail(bakTok, "DATABASE key word not found for CreateDatabase.");
         }
         cTok++;
         if(!plainText()) {
-            return fail(bakTok, "Invalid PlainText for CreateDatabase.");
+            return parseFail(bakTok, "Invalid PlainText for CreateDatabase.");
         }
         return true;
     }
@@ -96,15 +118,15 @@ public class Parser {
     private boolean createTable() {
         int bakTok = cTok;
         if(!tokens.get(cTok).equalsIgnoreCase("CREATE")) {
-            return fail(bakTok, "CREATE key word not found for CreateTable.");
+            return parseFail(bakTok, "CREATE key word not found for CreateTable.");
         }
         cTok++;
         if(!tokens.get(cTok).equalsIgnoreCase("TABLE")) {
-            return fail(bakTok, "TABLE key word not found for CreateTable.");
+            return parseFail(bakTok, "TABLE key word not found for CreateTable.");
         }
         cTok++;
         if(!plainText()) {
-            return fail(bakTok, "Invalid PlainText for CreateTable.");
+            return parseFail(bakTok, "Invalid PlainText for CreateTable.");
         }
         
         if(!tokens.get(cTok).equalsIgnoreCase("(")) {
@@ -114,10 +136,10 @@ public class Parser {
 
         bakTok = cTok;
         if(!attributeList()) {
-            return fail(bakTok, "Invalid AttributeList for CreateTable.");
+            return parseFail(bakTok, "Invalid AttributeList for CreateTable.");
         }
         if(!tokens.get(cTok).equalsIgnoreCase(")")) {
-            return fail(bakTok, "Missing ) for CreateTable.");
+            return parseFail(bakTok, "Missing ) for CreateTable.");
         }
         cTok++;
         return true;
@@ -126,7 +148,7 @@ public class Parser {
     private boolean attributeList() {
         int bakTok = cTok;
         if(!plainText()) {
-            return fail(bakTok, "Invalid PlainText for AttributeList.");
+            return parseFail(bakTok, "Invalid PlainText for AttributeList.");
         }
 
         if(!tokens.get(cTok).equalsIgnoreCase(",")) {
@@ -135,7 +157,7 @@ public class Parser {
         cTok++;
 
         if(!attributeList()) {
-            return fail(bakTok, "Invalid AttributeList for AttributeList.");
+            return parseFail(bakTok, "Invalid AttributeList for AttributeList.");
         }
         return true;
     }
@@ -143,18 +165,18 @@ public class Parser {
     private boolean drop() {
         int bakTok = cTok;
         if(!tokens.get(cTok).equalsIgnoreCase("DROP")) {
-            return fail(bakTok, "DROP key word not found for Drop.");
+            return parseFail(bakTok, "DROP key word not found for Drop.");
         }
         cTok++;
 
         if(!tokens.get(cTok).equalsIgnoreCase("DATABASE") &&
                 !tokens.get(cTok).equalsIgnoreCase("TABLE")) {
-            return fail(bakTok, "No DATABASE or TABLE for Drop.");
+            return parseFail(bakTok, "No DATABASE or TABLE for Drop.");
         }
         cTok++;
         
         if(!plainText()) {
-            return fail(bakTok, "Invalid PlainText for Drop.");
+            return parseFail(bakTok, "Invalid PlainText for Drop.");
         }
         return true;
     }
@@ -162,25 +184,25 @@ public class Parser {
     private boolean alter() {
         int bakTok = cTok;
         if(!tokens.get(cTok).equalsIgnoreCase("ALTER")) {
-            return fail(bakTok, "ALTER key word not found for Alter.");
+            return parseFail(bakTok, "ALTER key word not found for Alter.");
         }
         cTok++;
 
         if(!tokens.get(cTok).equalsIgnoreCase("TABLE")) {
-            return fail(bakTok, "TABLE key word not found for Alter.");
+            return parseFail(bakTok, "TABLE key word not found for Alter.");
         }
         cTok++;
 
         if(!plainText()) {
-            return fail(bakTok, "Invalid PlainText for Alter.");
+            return parseFail(bakTok, "Invalid PlainText for Alter.");
         }
         
         if(!alterationType()) {
-            return fail(bakTok, "Invalid AlterationType for Alter.");
+            return parseFail(bakTok, "Invalid AlterationType for Alter.");
         }
 
         if(!plainText()) {
-            return fail(bakTok, "Invalid PlainText for Alter.");
+            return parseFail(bakTok, "Invalid PlainText for Alter.");
         }
         return true;
     }
@@ -189,7 +211,7 @@ public class Parser {
         int bakTok = cTok;
         if(!tokens.get(cTok).equalsIgnoreCase("ADD") &&
                 !tokens.get(cTok).equalsIgnoreCase("DROP")) {
-            return fail(bakTok, "No ADD or DROP key word for AlterationType.");
+            return parseFail(bakTok, "No ADD or DROP key word for AlterationType.");
         }
         cTok++;
         return true;
@@ -198,35 +220,35 @@ public class Parser {
     private boolean insert() {
         int bakTok = cTok;
         if(!tokens.get(cTok).equalsIgnoreCase("INSERT")) {
-            return fail(bakTok, "INSERT key word not found for Insert.");
+            return parseFail(bakTok, "INSERT key word not found for Insert.");
         }
         cTok++;
 
         if(!tokens.get(cTok).equalsIgnoreCase("INTO")) {
-            return fail(bakTok, "INTO key word not found for Insert.");
+            return parseFail(bakTok, "INTO key word not found for Insert.");
         }
         cTok++;
         
         if(!plainText()) {
-            return fail(bakTok, "Invalid PlainText for Insert.");
+            return parseFail(bakTok, "Invalid PlainText for Insert.");
         }
 
         if(!tokens.get(cTok).equalsIgnoreCase("VALUES")) {
-            return fail(bakTok, "VALUES key word not found for Insert.");
+            return parseFail(bakTok, "VALUES key word not found for Insert.");
         }
         cTok++;
 
         if(!tokens.get(cTok).equalsIgnoreCase("(")) {
-            return fail(bakTok, "( not found for Insert.");
+            return parseFail(bakTok, "( not found for Insert.");
         }
         cTok++;
 
         if(!valueList()) {
-            return fail(bakTok, "Invalid ValueList for Insert.");
+            return parseFail(bakTok, "Invalid ValueList for Insert.");
         }
 
         if(!tokens.get(cTok).equalsIgnoreCase(")")) {
-            return fail(bakTok, ") not found for Insert.");
+            return parseFail(bakTok, ") not found for Insert.");
         }
         cTok++;
         return true;
@@ -235,7 +257,7 @@ public class Parser {
     private boolean valueList() {
         int bakTok = cTok;
         if(!value()) {
-            return fail(bakTok, "Invalid Value for ValueList.");
+            return parseFail(bakTok, "Invalid Value for ValueList.");
         }
 
         if(!tokens.get(cTok).equalsIgnoreCase(",")) {
@@ -244,7 +266,7 @@ public class Parser {
         cTok++;
 
         if(!valueList()) {
-            return fail(bakTok, "Invalid ValueList for ValueList.");
+            return parseFail(bakTok, "Invalid ValueList for ValueList.");
         }
         return true;
     }
@@ -255,7 +277,7 @@ public class Parser {
             return true;
         }
         if(!tokens.get(cTok).equalsIgnoreCase("NULL")) {
-            return fail(bakTok, "Invalid Value.");
+            return parseFail(bakTok, "Invalid Value.");
         }
         cTok++;
         return true;
@@ -265,7 +287,7 @@ public class Parser {
         int bakTok = cTok;
         String regexStr = "^'[ a-zA-Z0-9!#$%&()*+,\\-./:;>=<?@\\[\\\\\\]^_`{}~]*'$";
         if(!tokens.get(cTok).matches(regexStr)) {
-            return fail(bakTok, "Not StringLiteral.");
+            return parseFail(bakTok, "Not StringLiteral.");
         }
         cTok++;
         return true;
@@ -275,7 +297,7 @@ public class Parser {
         int bakTok = cTok;
         if(!tokens.get(cTok).equalsIgnoreCase("TRUE") &&
                 !tokens.get(cTok).equalsIgnoreCase("FALSE")){
-            return fail(bakTok, "Not BooleanLiteral.");
+            return parseFail(bakTok, "Not BooleanLiteral.");
         }
         cTok++;
         return true;
@@ -285,7 +307,7 @@ public class Parser {
         int bakTok = cTok;
         String regexStr = "^[-+]?[0-9]+.[0-9]+$";
         if(!tokens.get(cTok).matches(regexStr)) {
-            return fail(bakTok, "Not FloatLiteral.");
+            return parseFail(bakTok, "Not FloatLiteral.");
         }
         cTok++;
         return true;
@@ -293,9 +315,9 @@ public class Parser {
 
     private boolean integerLiteral() {
         int bakTok = cTok;
-        String regexStr = "^[-+]?[0-9]$";
+        String regexStr = "^[-+]?[0-9]+$";
         if(!tokens.get(cTok).matches(regexStr)) {
-            return fail(bakTok, "Not IntegerLiteral.");
+            return parseFail(bakTok, "Not IntegerLiteral.");
         }
         cTok++;
         return true;
@@ -304,21 +326,21 @@ public class Parser {
     private boolean select() {
         int bakTok = cTok;
         if(!tokens.get(cTok).equalsIgnoreCase("SELECT")) {
-            return fail(bakTok, "SELECT key word not found for Select.");
+            return parseFail(bakTok, "SELECT key word not found for Select.");
         }
         cTok++;
 
         if(!wildAttribList()) {
-            return fail(bakTok, "Invalid WildAttribList for Select.");
+            return parseFail(bakTok, "Invalid WildAttribList for Select.");
         }
 
         if(!tokens.get(cTok).equalsIgnoreCase("FROM")) {
-            return fail(bakTok, "FROM key word not found for Select.");
+            return parseFail(bakTok, "FROM key word not found for Select.");
         }
         cTok++;
 
         if(!plainText()) {
-            return fail(bakTok, "Invalid PlainText for Select.");
+            return parseFail(bakTok, "Invalid PlainText for Select.");
         }
 
         if(!tokens.get(cTok).equalsIgnoreCase("WHERE")) {
@@ -327,7 +349,7 @@ public class Parser {
         cTok++;
 
         if(!condition()) {
-            return fail(bakTok, "Invalid Condition for Select.");
+            return parseFail(bakTok, "Invalid Condition for Select.");
         }
         return true;
     }
@@ -338,9 +360,10 @@ public class Parser {
             return true;
         }
         if(tokens.get(cTok).equals("*")) {
+            cTok++;
             return true;
         }
-        return fail(bakTok, "Invalid WildAttribList.");
+        return parseFail(bakTok, "Invalid WildAttribList.");
     }
 
     private boolean condition() {
@@ -348,36 +371,30 @@ public class Parser {
         if(tokens.get(cTok).equals("(")) {
             cTok++;
             if(!condition()) {
-                return fail(bakTok, "Invalid Condition for Condition.");
+                return parseFail(bakTok, "Invalid Condition for Condition.");
             }
             if(!tokens.get(cTok).equals(")")) {
-                return fail(bakTok, "Missing ) for Condition.");
+                return parseFail(bakTok, "Missing ) for Condition.");
             }
             cTok++;
-            return true;
         }
-
-        if(condition()) {
-            if(!boolOperator()) {
-                return fail(bakTok, "Invalid BoolOperation for Condition.");
-            }
-            if(!condition()) {
-                return fail(bakTok, "Invalid Condition for Condition.");
-            }
-            return true;
-        }
-
-        if(plainText()) {
+        else if(plainText()) {
             if(!comparator()) {
-                return fail(bakTok, "Invalid Comparator for Condition.");
+                return parseFail(bakTok, "Invalid Comparator for Condition.");
             }
-            if(!plainText()) {
-                return fail(bakTok, "Invalid PlainText for Condition.");
+            if(!value()) {
+                return parseFail(bakTok, "Invalid PlainText for Condition.");
             }
+        }
+
+        if(!boolOperator()) {
             return true;
         }
 
-        return fail(bakTok, "Invalid Condition.");
+        if(!condition()) {
+            return parseFail(bakTok, "Invalid Condition for Condition.");
+        }
+        return true;
     }
 
     private boolean boolOperator() {
@@ -387,7 +404,7 @@ public class Parser {
             cTok++;
             return true;
         }
-        return fail(bakTok, "Not BoolOperator.");
+        return parseFail(bakTok, "Not BoolOperator.");
     }
 
     private boolean comparator() {
@@ -399,38 +416,39 @@ public class Parser {
                 tokens.get(cTok).equalsIgnoreCase("<=") ||
                 tokens.get(cTok).equalsIgnoreCase("!=") ||
                 tokens.get(cTok).equalsIgnoreCase("LIKE")) {
+            cTok++;
             return true;
         }
-        return fail(bakTok, "Not Comparator.");
+        return parseFail(bakTok, "Not Comparator.");
     }
 
     private boolean update() {
         int bakTok = cTok;
         if(!tokens.get(cTok).equalsIgnoreCase("UPDATE")) {
-            return fail(bakTok, "UPDATE key word not found for Update.");
+            return parseFail(bakTok, "UPDATE key word not found for Update.");
         }
         cTok++;
 
         if(!plainText()) {
-            return fail(bakTok, "Invalid PlainText for Update.");
+            return parseFail(bakTok, "Invalid PlainText for Update.");
         }
 
         if(!tokens.get(cTok).equalsIgnoreCase("SET")) {
-            return fail(bakTok, "SET key word not found for Update.");
+            return parseFail(bakTok, "SET key word not found for Update.");
         }
         cTok++;
 
         if(!nameValueList()) {
-            return fail(bakTok, "Invalid NameValueList for Update.");
+            return parseFail(bakTok, "Invalid NameValueList for Update.");
         }
 
         if(!tokens.get(cTok).equalsIgnoreCase("WHERE")) {
-            return fail(bakTok, "WHERE key word not found for Update.");
+            return parseFail(bakTok, "WHERE key word not found for Update.");
         }
         cTok++;
 
         if(!condition()) {
-            return fail(bakTok, "Invalid Condition for Update.");
+            return parseFail(bakTok, "Invalid Condition for Update.");
         }
 
         return true;
@@ -439,7 +457,7 @@ public class Parser {
     private boolean nameValueList() {
         int bakTok = cTok;
         if(!nameValuePair()) {
-            return fail(bakTok, "Invalid NameValuePair for NameValueList.");
+            return parseFail(bakTok, "Invalid NameValuePair for NameValueList.");
         }
 
         if(!tokens.get(cTok).equalsIgnoreCase(",")) {
@@ -448,22 +466,95 @@ public class Parser {
         cTok++;
 
         if(!nameValueList()) {
-            return fail(bakTok, "Invalid NameValueList for NameValueList.");
+            return parseFail(bakTok, "Invalid NameValueList for NameValueList.");
         }
+
         return true;
     }
 
     private boolean nameValuePair() {
         int bakTok = cTok;
-        
-    }
+        if(!plainText()) {
+            return parseFail(bakTok, "Invalid PlainText for NameValuePair.");
+        }
 
-    private boolean plainText() {
-        int bakTok = cTok;
-        if(!tokens.get(cTok).matches("^[a-zA-Z0-9]+$")) {
-            return fail(bakTok, "Not plaintext.");
+        if(!tokens.get(cTok).equalsIgnoreCase("=")) {
+            return parseFail(bakTok, "Missing = for NameValuePair");
         }
         cTok++;
+
+        if(!value()) {
+            return parseFail(bakTok, "Invalid Value for NameValuePair.");
+        }
+
+        return true;
+    }
+
+    private boolean delete() {
+        int bakTok = cTok;
+        if(!tokens.get(cTok).equalsIgnoreCase("DELETE")) {
+            return parseFail(bakTok, "DELETE key word not found for Delete.");
+        }
+        cTok++;
+
+        if(!tokens.get(cTok).equalsIgnoreCase("FROM")) {
+            return parseFail(bakTok, "FROM key word not found for Delete.");
+        }
+        cTok++;
+
+        if(!plainText()) {
+            return parseFail(bakTok, "Invalid PlainText for Delete.");
+        }
+
+        if(!tokens.get(cTok).equalsIgnoreCase("WHERE")) {
+            return parseFail(bakTok, "WHERE key word not found for Delete.");
+        }
+        cTok++;
+
+        if(!condition()) {
+            return parseFail(bakTok, "Invalid Condition for Delete.");
+        }
+
+        return true;
+    }
+
+    private boolean join() {
+        int bakTok = cTok;
+        if(!tokens.get(cTok).equalsIgnoreCase("JOIN")) {
+            return parseFail(bakTok, "JOIN key word not found for Join.");
+        }
+        cTok++;
+
+        if(!plainText()) {
+            return parseFail(bakTok, "Invalid PlainText for Join.");
+        }
+
+        if(!tokens.get(cTok).equalsIgnoreCase("AND")) {
+            return parseFail(bakTok, "AND key word not found for Join.");
+        }
+        cTok++;
+
+        if(!plainText()) {
+            return parseFail(bakTok, "Invalid PlainText for Join.");
+        }
+
+        if(!tokens.get(cTok).equalsIgnoreCase("ON")) {
+            return parseFail(bakTok, "ON key word not found for Join.");
+        }
+        cTok++;
+
+        if(!plainText()) {
+            return parseFail(bakTok, "Invalid PlainText for Join.");
+        }
+        if(!tokens.get(cTok).equalsIgnoreCase("AND")) {
+            return parseFail(bakTok, "AND key word not found for Join.");
+        }
+        cTok++;
+
+        if(!plainText()) {
+            return parseFail(bakTok, "Invalid PlainText for Join.");
+        }
+
         return true;
     }
 }

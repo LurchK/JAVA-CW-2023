@@ -42,12 +42,13 @@ public class DBServer {
     * <p>This method handles all incoming DB commands and carries out the required actions.
     */
     public String handleCommand(String command) {
-        // TODO implement your server logic here
-        String message;
+        String message = "";
+        DBTokenizer tokenizer = new DBTokenizer(command);
+        tokenizer.tokenize();
+        if(tokenizer.getTokens().get(0).isEmpty()) return message;
         try {
-            DBTokenizer tokenizer = new DBTokenizer(command);
             Parser parser = new Parser(tokenizer.getTokens());
-
+            if(!parser.parse()) throw new DBException(parser.getFailMessage());
             String dataMessage = "";
             message = "[OK]" + dataMessage;
         }
