@@ -7,7 +7,7 @@ public class Development {
     public static void main(String[] args) {
         String command = "  INSERT  INTO  people   VALUES(  'Simon Lock'  ,35, 'simon@bristol.ac.uk' , 1.8  ) ;  ";
         try {
-            DBTokens tokens = new DBTokens(command);
+            DBTokenizer tokens = new DBTokenizer(command);
         }
         catch (Exception e) {
             System.out.println("[ERROR]: " + e.getMessage());
