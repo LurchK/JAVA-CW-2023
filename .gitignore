@@ -10,3 +10,7 @@ cw-db/target/
 /cw-db/.idea
 cw-db/startDBClient.bat
 cw-db/startDBServer.bat
+BNF_cleaned.txt
+cw-db/clean_and_compile.bat
+cw-db/startBoth.bat
+~$ample-transcript.docx
