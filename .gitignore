@@ -14,3 +14,5 @@ BNF_cleaned.txt
 cw-db/clean_and_compile.bat
 cw-db/startBoth.bat
 ~$ample-transcript.docx
+BNF_functionality_focused.txt
+BNF_parser_focused.txt

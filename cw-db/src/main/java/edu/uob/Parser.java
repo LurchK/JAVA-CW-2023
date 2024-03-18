@@ -30,9 +30,9 @@ public class Parser {
     private boolean parseFail(int bakTok, String str) {
         if(cTok >= failTok) {
             failTok = cTok;
-            failMessage = "Invalid command. " +
+            failMessage = "Invalid command. \n\t" +
                     "Parser error around token with index " + failTok + ": " +
-                    tokens.get(failTok) + ". " + str;
+                    tokens.get(failTok) + ". \n\t" + str;
         }
         cTok = bakTok;
         return false;

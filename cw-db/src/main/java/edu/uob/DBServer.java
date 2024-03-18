@@ -10,12 +10,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
 import java.nio.file.Files;
+import java.util.List;
 
 /** This class implements the DB server. */
 public class DBServer {
 
     private static final char END_OF_TRANSMISSION = 4;
     private String storageFolderPath;
+    private DBModel dbModel;
 
     public static void main(String[] args) throws IOException {
         DBServer server = new DBServer();
@@ -30,8 +32,12 @@ public class DBServer {
         try {
             // Create the database storage folder if it doesn't already exist !
             Files.createDirectories(Paths.get(storageFolderPath));
+            dbModel = new DBModel(new File(storageFolderPath));
         } catch(IOException ioe) {
             System.out.println("Can't seem to create database storage folder " + storageFolderPath);
+        } catch(DBException dbe) {
+            System.out.println("Can't initialize the database model from database storage folder " + storageFolderPath +
+                    "\n" + dbe.getMessage());
         }
     }
 

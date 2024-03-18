@@ -3,11 +3,11 @@ package edu.uob;
 import java.util.*;
 
 public class DBTokenizer {
-    List<String> tokens;
-    String tokenStr;
-    String[] specialCharacters = {"(",")",",",";"};
-    String[] unaryLogicalOperators = {">","<","==","!="};
-    String[] compositeLogicalOperators = {">=","<="};
+    private List<String> tokens;
+    private String tokenStr;
+    private String[] specialCharacters = {"(",")",",",";"};
+    private String[] unaryLogicalOperators = {">","<","==","!="};
+    private String[] compositeLogicalOperators = {">=","<="};
 
     public DBTokenizer(String str) {
         tokens = new ArrayList<>();
