@@ -5,14 +5,40 @@ import java.util.*;
 
 public class Development {
     public static void main(String[] args) {
-        String command = "  INSERT  INTO  people   VALUES(  'Simon Lock'  ,35, 'simon@bristol.ac.uk' , 1.8  ) ;  ";
+        String dirName = "databases" + File.separator + "testDB";
+        File dir = new File(dirName);
+        DBDatabase database = new DBDatabase();
         try {
-            DBTokenizer tokens = new DBTokenizer(command);
+            database.load(dir);
+
         }
-        catch (Exception e) {
-            System.out.println("[ERROR]: " + e.getMessage());
+        catch (DBException dbe) {
+            System.out.println(dbe);
         }
+
         System.out.println("\nThis is the end of main.\n");
+    }
+    public static void mainTableReadWrite() {
+        String fileName = "databases" + File.separator + "testDB" + File.separator + "people.tab";
+        File file = new File(fileName);
+        DBTable table = new DBTable();
+        try {
+            table.load(file);
+            List<List<String>> selectOutput = table.select(List.of("*"));
+            for(List<String> rowData : selectOutput) {
+                System.out.println(rowData);
+            }
+            List<List<String>> data = selectOutput.subList(1,selectOutput.size());
+            int name = Integer.parseInt(data.get(2).get(1));
+            System.out.println(name);
+            name++;
+            table.update(2, "name", String.valueOf(name));
+            printTable(table);
+            //table.updateFile();
+        }
+        catch (DBException dbe) {
+            System.out.println(dbe);
+        }
     }
 
     public static void mainGetTabs() {
@@ -43,5 +69,12 @@ public class Development {
     public static String testString(String str) {
         str = str.concat("_modified");
         return str;
+    }
+
+    public static void printTable(DBTable table) {
+        List<List<String>> selectOutput = table.select(List.of("*"));
+        for(List<String> rowData : selectOutput) {
+            System.out.println(rowData);
+        }
     }
 }
