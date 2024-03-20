@@ -5,16 +5,7 @@ import java.util.*;
 
 public class Development {
     public static void main(String[] args) {
-        String dirName = "databases" + File.separator + "testDB";
-        File dir = new File(dirName);
-        DBDatabase database = new DBDatabase();
-        try {
-            database.load(dir);
-
-        }
-        catch (DBException dbe) {
-            System.out.println(dbe);
-        }
+        mainTableReadWrite();
 
         System.out.println("\nThis is the end of main.\n");
     }
@@ -32,12 +23,12 @@ public class Development {
             int name = Integer.parseInt(data.get(2).get(1));
             System.out.println(name);
             name++;
-            table.update(2, "name", String.valueOf(name));
+            table.update(List.of(2), List.of(List.of("name", String.valueOf(name))));
             printTable(table);
             //table.updateFile();
         }
-        catch (DBException dbe) {
-            System.out.println(dbe);
+        catch (Exception e) {
+            System.out.println(e);
         }
     }
 

@@ -49,17 +49,22 @@ public class DBServer {
     */
     public String handleCommand(String command) {
         String message = "";
-        DBTokenizer tokenizer = new DBTokenizer(command);
+        Tokenizer tokenizer = new Tokenizer(command);
         tokenizer.tokenize();
         if(tokenizer.getTokens().get(0).isEmpty()) return message;
         try {
             Parser parser = new Parser(tokenizer.getTokens());
             if(!parser.parse()) throw new DBException(parser.getFailMessage());
-            String dataMessage = "";
+            Interpreter interpreter = new Interpreter(dbModel);
+            interpreter.interpret(tokenizer.getTokens());
+            String dataMessage = interpreter.getDataMessage();
             message = "[OK]" + dataMessage;
         }
+        catch(DBException dbe) {
+            message = "[Error]: " + dbe.getMessage();
+        }
         catch(Exception e) {
-            message = "[ERROR]: " + e.getMessage();
+            message = "[ERROR]: " + e;
         }
         return message;
     }

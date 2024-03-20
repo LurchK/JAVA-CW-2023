@@ -9,6 +9,7 @@ public class DBTable {
     public final static String FILEEXTENSION = ".tab";
     public final static String COLUMNDELIMITER = "\t";
     public final static String LINEOFDELETED = "DELETED";
+    public final static String EMPTY = "NULL";
     private int numOfRows;
     private int numOfColumns;
     private List<String> headings;
@@ -16,9 +17,9 @@ public class DBTable {
 
     public void create(File file) throws DBException {
         if(file == null) createError("null input");
-        tableFile = file;
-        tableName = file.getName().replaceAll(FILEEXTENSION, "");
-        if(file.exists()) createError("file already exists");
+        tableName = file.getName().toLowerCase().replaceAll(FILEEXTENSION, "");
+        tableFile = new File(file.getParent(), tableName + FILEEXTENSION);
+        if(tableFile.exists()) createError("file already exists");
         try{
             if(!tableFile.createNewFile()) createError("cannot create file");
         }
@@ -42,6 +43,7 @@ public class DBTable {
         if(file == null) loadError("null input");
         tableFile = file;
         tableName = file.getName().replaceAll(FILEEXTENSION, "");
+        if(tableName.matches("[A-Z]")) loadError("name contains uppercase letter");
         if(!tableFile.exists()) loadError("file does not exist");
         if(!tableFile.isFile()) loadError("path is not a file");
         if(!tableFile.canRead()) loadError("cannot read file");
@@ -120,6 +122,7 @@ public class DBTable {
 
     public void alterAdd(String attribute) throws DBException {
         if(attribute == null) alterError("null input");
+        if(attribute.isBlank()) alterError("blank input");
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
         String attributeLC = attribute.toLowerCase();
         if(headingsLC.contains(attributeLC)) alterError("attribute '" + attribute + "' already exists");
@@ -127,17 +130,18 @@ public class DBTable {
         numOfColumns++;
 
         for(List<String> rowData : data) {
-            rowData.add("");
+            rowData.add(EMPTY);
         }
     }
 
     public void alterDrop(String attribute) throws DBException {
         if(attribute == null) alterError("null input");
+        if(attribute.isBlank()) alterError("blank input");
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
         String attributeLC = attribute.toLowerCase();
         if(!headingsLC.contains(attributeLC)) alterError(("attribute '" + attribute + "' does not exist"));
         int index = headingsLC.indexOf(attributeLC);
-        headings.remove(attribute);
+        headings.remove(index);
         numOfColumns--;
 
         for(List<String> rowData : data) {
@@ -151,13 +155,13 @@ public class DBTable {
                 str);
     }
 
-    public void insert(String[] insertData) throws DBException{
+    public void insert(List<String> insertData) throws DBException{
         if(insertData == null) insertError("null input");
-        if(insertData.length != numOfColumns-1) insertError("incorrect number of values");
+        if(insertData.size() != numOfColumns-1) insertError("incorrect number of values");
 
         List<String> insertRow = new ArrayList<>();
         insertRow.add(String.valueOf(numOfRows));
-        insertRow.addAll(List.of(insertData));
+        insertRow.addAll(insertData);
 
         data.add(insertRow);
         numOfRows++;
@@ -203,16 +207,27 @@ public class DBTable {
         return returnList;
     }
 
-    public void update(int row, String key, String value) throws DBException {
+    public void update(List<Integer> rows, List<List<String>> nameValueList) throws DBException {
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
+        for(int row : rows) {
+            if(row<0 || row >= numOfRows) updateError("invalid row index");
+        }
+        for(List<String> nameValuePair : nameValueList) {
+            if(nameValuePair.size() != 2) updateError("invalid size of name value pair");
+            String key = nameValuePair.get(0);
+            if(key == null || key.isBlank() || !headingsLC.contains(key.toLowerCase())) updateError("invalid key");
+            if(key.equalsIgnoreCase("id")) updateError("id update is not permitted");
+        }
 
-        if(row<0 || row >= numOfRows) updateError("invalid row index");
-        if(key == null || key.isBlank() || !headingsLC.contains(key.toLowerCase())) updateError("invalid key");
-        if(key.equalsIgnoreCase("id")) updateError("id update is not permitted");
-        if(value == null) value = "NULL";
-
-        int column = headingsLC.indexOf(key.toLowerCase());
-        data.get(row).set(column, value);
+        for(int row : rows) {
+            for(List<String> nameValuePair : nameValueList) {
+                String key = nameValuePair.get(0);
+                String value = nameValuePair.get(1);
+                if(value == null) value = "NULL";
+                int column = headingsLC.indexOf(key.toLowerCase());
+                data.get(row).set(column, value);
+            }
+        }
     }
 
     private void updateError(String str) throws DBException {
@@ -221,9 +236,13 @@ public class DBTable {
                 str);
     }
 
-    public void delete(int row) throws DBException {
-        if(row<0 || row >= numOfRows) deleteError("invalid row index");
-        data.set(row, new ArrayList<>(List.of(LINEOFDELETED)));
+    public void delete(List<Integer> rows) throws DBException {
+        for(int row : rows) {
+            if(row<0 || row >= numOfRows) deleteError("invalid row index");
+        }
+        for(int row : rows) {
+            data.set(row, new ArrayList<>(List.of(LINEOFDELETED)));
+        }
     }
 
     private void deleteError(String str) throws DBException {
@@ -234,11 +253,15 @@ public class DBTable {
 
     // The following methods are functionalities which are not shown in the BNF document
 
-    public File getTableFile() {
+    public File getFile() {
         return tableFile;
     }
 
-    public String getTableName() {
+    public String getName() {
         return tableName;
+    }
+
+    public List<String> getHeadings() {
+        return headings;
     }
 }

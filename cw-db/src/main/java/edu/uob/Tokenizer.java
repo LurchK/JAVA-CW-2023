@@ -2,14 +2,14 @@ package edu.uob;
 
 import java.util.*;
 
-public class DBTokenizer {
+public class Tokenizer {
     private List<String> tokens;
     private String tokenStr;
     private String[] specialCharacters = {"(",")",",",";"};
     private String[] unaryLogicalOperators = {">","<","==","!="};
     private String[] compositeLogicalOperators = {">=","<="};
 
-    public DBTokenizer(String str) {
+    public Tokenizer(String str) {
         tokens = new ArrayList<>();
         tokenStr = str;
     }

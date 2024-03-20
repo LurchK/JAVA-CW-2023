@@ -386,6 +386,9 @@ public class Parser {
                 return parseFail(bakTok, "Invalid PlainText for Condition.");
             }
         }
+        else {
+            return parseFail(bakTok, "Invalid PlainText for Condition.");
+        }
 
         if(!boolOperator()) {
             return true;
