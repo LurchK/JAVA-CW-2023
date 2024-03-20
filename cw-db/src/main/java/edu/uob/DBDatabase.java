@@ -256,4 +256,17 @@ public class DBDatabase {
     public Map<String, DBTable> getTables() {
         return tables;
     }
+
+    public DBTable getTable(String tableName) throws DBException {
+        if(tableName == null) getTableError("null input");
+        tableName = tableName.toLowerCase();
+        if(!tables.containsKey(tableName)) getTableError("table does not exist");
+        return tables.get(tableName);
+    }
+
+    private void getTableError(String str) throws DBException {
+        throw new DBException("failed to get table in database " + databaseName + ":\n\t" +
+                databaseDir + ",\n\t" +
+                str);
+    }
 }

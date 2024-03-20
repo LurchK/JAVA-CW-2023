@@ -264,4 +264,8 @@ public class DBTable {
     public List<String> getHeadings() {
         return headings;
     }
+
+    public List<List<String>> getData() {
+        return data;
+    }
 }

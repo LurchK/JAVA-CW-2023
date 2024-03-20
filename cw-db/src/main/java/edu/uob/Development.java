@@ -5,7 +5,6 @@ import java.util.*;
 
 public class Development {
     public static void main(String[] args) {
-        mainTableReadWrite();
 
         System.out.println("\nThis is the end of main.\n");
     }

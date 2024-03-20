@@ -16,6 +16,13 @@ public class Interpreter {
         dataMessage = "";
     }
 
+    private void writeDataMessage(List<List<String>> outputData) {
+        if(outputData == null) return;
+        for(List<String> outputRow : outputData) {
+            dataMessage = dataMessage + "\n" + String.join("\t", outputRow);
+        }
+    }
+
     public String getDataMessage() {
         return dataMessage;
     }
@@ -169,16 +176,40 @@ public class Interpreter {
         while(tokens.get(cTok++).equalsIgnoreCase(","));
 
         String tableName = tokens.get(cTok++);
-        List<List<String>> outputData = database.select(tableName, wildAttribList);
+        List<String> headings = database.getTable(tableName).getHeadings();
+        List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
+        List<List<String>> data = database.getTable(tableName).getData();
+
         if(tokens.get(cTok++).equalsIgnoreCase("where")) {
-            List<String> headings = outputData.get(0);
-            List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();;
-            List<List<String>> data = outputData.subList(1, outputData.size());
             data = condition(headingsLC, data);
-            data.add(0, headings);
-            outputData = data;
         }
-        writeDataMessage(outputData);
+
+        if(!wildAttribList.contains("*")) {
+            List<String> outputHeadings = new ArrayList<>();
+            List<Integer> outputColumnIndices = new ArrayList<>();
+            List<List<String>> outputData = new ArrayList<>();
+            for(String attribute : wildAttribList) {
+                String attributeLC = attribute.toLowerCase();
+                if(headingsLC.contains(attributeLC)) {
+                    outputHeadings.add(attribute);
+                    outputColumnIndices.add(headingsLC.indexOf(attributeLC));
+                }
+            }
+            for(List<String> rowData : data) {
+                List<String> outputRowData = new ArrayList<>();
+                for(int index : outputColumnIndices) {
+                    outputRowData.add(rowData.get(index));
+                }
+                outputData.add(outputRowData);
+            }
+            headings = outputHeadings;
+            data = outputData;
+        }
+
+        List<List<String>> output = new ArrayList<>();
+        output.add(headings);
+        output.addAll(data);
+        writeDataMessage(output);
     }
 
     private List<List<String>> condition(List<String> headingsLC, List<List<String>> inputData) throws DBException {
@@ -266,13 +297,6 @@ public class Interpreter {
         return returnData;
     }
 
-    private void writeDataMessage(List<List<String>> outputData) {
-        if(outputData == null) return;
-        for(List<String> outputRow : outputData) {
-            dataMessage = dataMessage + "\n" + String.join("\t", outputRow);
-        }
-    }
-
     private void update() throws DBException {
         DBDatabase database = dbModel.getCurrentDatabase();
         if(database == null) throw new DBException("no database used");
@@ -336,9 +360,38 @@ public class Interpreter {
         String table2Name = tokens.get(cTok++);
         cTok++;
         String attribute1 = tokens.get(cTok++);
+        String attribute1LC = attribute1.toLowerCase();
         cTok++;
         String attribute2 = tokens.get(cTok++);
+        String attribute2LC = attribute2.toLowerCase();
 
+        List<String> table1Headings = database.getTable(table1Name).getHeadings();
+        List<String> table2Headings = database.getTable(table2Name).getHeadings();
+        List<String> table1HeadingsLC = table1Headings.stream().map(String::toLowerCase).toList();
+        List<String> table2HeadingsLC = table2Headings.stream().map(String::toLowerCase).toList();
+        List<List<String>> table1Data = database.getTable(table1Name).getData();
+        List<List<String>> table2Data = database.getTable(table2Name).getData();
 
+        int table1ColumnIndex = table1HeadingsLC.indexOf(attribute1LC);
+        int table2ColumnIndex = table2HeadingsLC.indexOf(attribute2LC);
+
+        List<String> table2Column = new ArrayList<>();
+        for(List<String> table2Row : table2Data) {
+            table2Column.add(table2Row.get(table2ColumnIndex));
+        }
+
+        List<List<String>> outputData = new ArrayList<>();
+        for(List<String> table1Row : table1Data) {
+            String table1Value = table1Row.get(table1ColumnIndex);
+            int table2JoinIndex = table2Column.indexOf(table1Value);
+            if(table2JoinIndex!=-1) {
+                table1Row.remove(table1ColumnIndex);
+                List<String> table2Row = table2Data.get(table2JoinIndex);
+                table2Row.remove(table2ColumnIndex);
+                table1Row.addAll(table2Row);
+                outputData.add(table1Row);
+            }
+        }
+        writeDataMessage(outputData);
     }
 }
