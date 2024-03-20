@@ -269,7 +269,7 @@ public class Interpreter {
     private void writeDataMessage(List<List<String>> outputData) {
         if(outputData == null) return;
         for(List<String> outputRow : outputData) {
-            dataMessage = "\n" + dataMessage.concat(String.join("\t", outputRow));
+            dataMessage = dataMessage + "\n" + String.join("\t", outputRow);
         }
     }
 
