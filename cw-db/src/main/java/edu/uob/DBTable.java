@@ -141,7 +141,8 @@ public class DBTable {
         if(attribute.isBlank()) alterError("blank input");
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
         String attributeLC = attribute.toLowerCase();
-        if(!headingsLC.contains(attributeLC)) alterError(("attribute '" + attribute + "' does not exist"));
+        if(attributeLC.equals("id")) alterError("modification to id is not allowed");
+        if(!headingsLC.contains(attributeLC)) alterError("attribute '" + attribute + "' does not exist");
         int index = headingsLC.indexOf(attributeLC);
         headings.remove(index);
         numOfColumns--;
@@ -184,7 +185,7 @@ public class DBTable {
             if(nameValuePair.size() != 2) updateError("invalid size of name value pair");
             String key = nameValuePair.get(0);
             if(key == null || key.isBlank() || !headingsLC.contains(key.toLowerCase())) updateError("invalid key");
-            if(key.equalsIgnoreCase("id")) updateError("id update is not permitted");
+            if(key.equalsIgnoreCase("id")) updateError("modification to id is not allowed");
         }
 
         for(int row : rows) {
