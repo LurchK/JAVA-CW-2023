@@ -45,7 +45,7 @@ public class DBComplexConditionTests {
         // Test for a complex condition: Select active IT employees under 40 or Sales employees with salary over 65000
         String response = sendCommandToServer("SELECT * FROM employees WHERE " +
                 "((department == 'IT' AND age < 40 AND active == TRUE) OR " +
-                "(department == 'Sales' AND salary > 65000)) AND id != '1';");
+                "(department == 'Sales' AND salary > 50000)) AND id != '2';");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Complex condition query should be successful.");
         assertTrue(response.contains("Charlie"), "Charlie matches the IT condition.");

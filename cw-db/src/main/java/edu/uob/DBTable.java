@@ -62,7 +62,7 @@ public class DBTable {
 
             data = new ArrayList<>();
             for(line=buffReader.readLine(); line!=null; line=buffReader.readLine()) {
-                String[] rowData = line.split(COLUMNDELIMITER);
+                String[] rowData = line.split(COLUMNDELIMITER,-1);
                 if(rowData.length == 1 && rowData[0].matches("^ *[0-9]+ *$")) {
                     numOfRows = Integer.parseInt(rowData[0]);
                 }
