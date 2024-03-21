@@ -292,7 +292,7 @@ public class DBInterpreter {
                 return returnData;
             case "like":
                 for(List<String> rowData : inputData) {
-                    if(rowData.get(column).matches(value)) returnData.add(rowData);
+                    if(rowData.get(column).contains(value)) returnData.add(rowData);
                 }
                 return returnData;
             case "!=":

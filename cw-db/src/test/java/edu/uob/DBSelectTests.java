@@ -10,7 +10,7 @@ public class DBSelectTests {
 
     private DBServer server;
     private DBModel dbModel;
-    private final static String TESTDATABASE = "testselectdb";
+    private final static String TESTDATABASE = "testSelectDB".toLowerCase();
 
     @BeforeEach
     public void setup() {
