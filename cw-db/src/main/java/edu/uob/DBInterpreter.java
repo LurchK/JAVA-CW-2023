@@ -442,7 +442,6 @@ public class DBInterpreter {
             if(table2JoinIndex!=-1) {
                 table1Row.remove(table1ColumnIndex);
                 List<String> table2Row = table2Data.get(table2JoinIndex);
-                System.out.println(table1Row);
                 table2Row.remove(table2ColumnIndex);
                 table1Row.addAll(table2Row);
                 outputData.add(table1Row);
