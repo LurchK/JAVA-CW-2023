@@ -173,40 +173,6 @@ public class DBTable {
                 str);
     }
 
-    public List<List<String>> select(List<String> attributeList) {
-        List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
-        List<String> attributeListLC = attributeList.stream().map(String::toLowerCase).toList();
-        List<List<String>> returnList = new ArrayList<>();
-
-        if(attributeListLC.contains("*")) {
-            returnList.add(headings);
-            returnList.addAll(data);
-            return returnList;
-        }
-
-        List<String> returnHeader = new ArrayList<>(numOfColumns);
-        List<Integer> indicesOfHeadings = new ArrayList<>(numOfColumns);
-
-        for(String attribute : attributeList) {
-            String attributeLC = attribute.toLowerCase();
-            if(headingsLC.contains(attributeLC)) {
-                returnHeader.add(attribute);
-                indicesOfHeadings.add(headingsLC.indexOf(attributeLC));
-            }
-        }
-        returnList.add(returnHeader);
-
-        for(List<String> rowData : data) {
-            List<String> returnData = new ArrayList<>(returnHeader.size());
-            for(int index : indicesOfHeadings) {
-                returnData.add(rowData.get(index));
-            }
-            returnList.add(returnData);
-        }
-
-        return returnList;
-    }
-
     public void update(List<Integer> rows, List<List<String>> nameValueList) throws DBException {
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
         for(int row : rows) {

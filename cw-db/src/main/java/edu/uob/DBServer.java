@@ -61,7 +61,7 @@ public class DBServer {
             message = "[OK]" + dataMessage;
         }
         catch(DBException dbe) {
-            message = "[Error]: " + dbe.getMessage();
+            message = "[ERROR]: " + dbe.getMessage();
         }
         catch(Exception e) {
             message = "[ERROR]: " + e;

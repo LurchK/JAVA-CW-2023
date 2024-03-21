@@ -86,13 +86,14 @@ public class Interpreter {
 
         String tableName = tokens.get(cTok++);
         database.createTable(tableName);
+        DBTable table = database.getTable(tableName);
 
         if(tokens.get(cTok++).equalsIgnoreCase("(")) {
             List<String> attributeList = getAttributeList();
             for(String attribute : attributeList) {
-                database.alterAdd(tableName, attribute);
+                table.alterAdd(attribute);
             }
-            database.updateFiles();
+            table.updateFile();
         }
     }
 
@@ -120,17 +121,18 @@ public class Interpreter {
     }
 
     private void alter() throws DBException {
-        cTok++;
         DBDatabase database = dbModel.getCurrentDatabase();
         if(database == null) throw new DBException("no database used");
 
+        cTok++;
         String tableName = tokens.get(cTok++);
+        DBTable table = database.getTable(tableName);
         switch(tokens.get(cTok++).toLowerCase()) {
             case "add":
-                database.alterAdd(tableName, tokens.get(cTok));
+                table.alterAdd(tokens.get(cTok));
                 break;
             case "drop":
-                database.alterDrop(tableName, tokens.get(cTok));
+                table.alterDrop(tokens.get(cTok));
                 break;
         }
     }
@@ -141,10 +143,11 @@ public class Interpreter {
 
         cTok++;
         String tableName = tokens.get(cTok++);
+        DBTable table = database.getTable(tableName);
         cTok+=2;
         List<String> valueList = getValueList();
-        database.insert(tableName, valueList);
-        database.updateFiles();
+        table.insert(valueList);
+        table.updateFile();
     }
 
     private List<String> getValueList() {
@@ -302,6 +305,8 @@ public class Interpreter {
         if(database == null) throw new DBException("no database used");
 
         String tableName = tokens.get(cTok++);
+        DBTable table = database.getTable(tableName);
+
         cTok++;
         List<List<String>> nameValueList = new ArrayList<>();
         do {
@@ -313,10 +318,9 @@ public class Interpreter {
         }
         while(tokens.get(cTok++).equalsIgnoreCase(","));
 
-        List<List<String>> wholeTableData = database.select(tableName, List.of("*"));
-        List<String> headings = wholeTableData.get(0);
+        List<String> headings = table.getHeadings();
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();;
-        List<List<String>> data = wholeTableData.subList(1,wholeTableData.size());
+        List<List<String>> data = table.getData();
         data = condition(headingsLC, data);
 
         List<Integer> rowIndices = new ArrayList<>();
@@ -324,8 +328,8 @@ public class Interpreter {
             rowIndices.add(Integer.parseInt(rowData.get(0)));
         }
 
-        database.update(tableName, rowIndices, nameValueList);
-        database.updateFiles();
+        table.update(rowIndices, nameValueList);
+        table.updateFile();
     }
 
     private void delete() throws DBException {
@@ -334,12 +338,12 @@ public class Interpreter {
 
         cTok++;
         String tableName = tokens.get(cTok++);
+        DBTable table = database.getTable(tableName);
         cTok++;
 
-        List<List<String>> wholeTableData = database.select(tableName, List.of("*"));
-        List<String> headings = wholeTableData.get(0);
+        List<String> headings = table.getHeadings();
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();;
-        List<List<String>> data = wholeTableData.subList(1,wholeTableData.size());
+        List<List<String>> data = table.getData();
         data = condition(headingsLC, data);
 
         List<Integer> rowIndices = new ArrayList<>();
@@ -347,8 +351,8 @@ public class Interpreter {
             rowIndices.add(Integer.parseInt(rowData.get(0)));
         }
 
-        database.delete(tableName, rowIndices);
-        database.updateFiles();
+        table.delete(rowIndices);
+        table.updateFile();
     }
 
     private void join() throws DBException {

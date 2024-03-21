@@ -14,11 +14,8 @@ public class Development {
         DBTable table = new DBTable();
         try {
             table.load(file);
-            List<List<String>> selectOutput = table.select(List.of("*"));
-            for(List<String> rowData : selectOutput) {
-                System.out.println(rowData);
-            }
-            List<List<String>> data = selectOutput.subList(1,selectOutput.size());
+            printTable(table);
+            List<List<String>> data = table.getData();
             int name = Integer.parseInt(data.get(2).get(1));
             System.out.println(name);
             name++;
@@ -62,8 +59,8 @@ public class Development {
     }
 
     public static void printTable(DBTable table) {
-        List<List<String>> selectOutput = table.select(List.of("*"));
-        for(List<String> rowData : selectOutput) {
+        System.out.println(table.getHeadings());
+        for(List<String> rowData : table.getData()) {
             System.out.println(rowData);
         }
     }
