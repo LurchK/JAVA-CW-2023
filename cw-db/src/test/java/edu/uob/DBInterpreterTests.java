@@ -73,4 +73,45 @@ public class DBInterpreterTests {
         assertTrue(response.contains("Simon"), "An attempt was made to add Simon to the table, but they were not returned by SELECT *");
         assertTrue(response.contains("Chris"), "An attempt was made to add Chris to the table, but they were not returned by SELECT *");
     }
+
+    @Test
+    public void testUpdate() {
+        sendCommandToServer("CREATE DATABASE " + TESTDATABASE + ";");
+        sendCommandToServer("USE " + TESTDATABASE + ";");
+        sendCommandToServer("CREATE TABLE marks (Name, Mark, Pass);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Simon', 65, TRUE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Sion', 55, TRUE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Rob', 35, FALSE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Chris', 20, FALSE);");
+        sendCommandToServer("CREATE TABLE marks2 (Name, Mark, Pass);");
+        sendCommandToServer("INSERT INTO marks2 VALUES ('Simon', 65, TRUE);");
+        sendCommandToServer("INSERT INTO marks2 VALUES ('Sion', 55, TRUE);");
+        sendCommandToServer("INSERT INTO marks2 VALUES ('Rob', 35, FALSE);");
+        sendCommandToServer("INSERT INTO marks2 VALUES ('Chris', 20, FALSE);");
+
+        sendCommandToServer("UPDATE marks SET mark = 0 WHERE name == 'Simon';");
+        String response = sendCommandToServer("SELECT * FROM marks;");
+        System.out.println(response);
+    }
+
+    @Test
+    public void testDelete() {
+        sendCommandToServer("CREATE DATABASE " + TESTDATABASE + ";");
+        sendCommandToServer("USE " + TESTDATABASE + ";");
+        sendCommandToServer("CREATE TABLE marks (Name, Mark, Pass);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Simon', 65, TRUE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Sion', 55, TRUE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Rob', 35, FALSE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Chris', 20, FALSE);");
+        sendCommandToServer("CREATE TABLE marks2 (Name, Mark, Pass);");
+        sendCommandToServer("INSERT INTO marks2 VALUES ('Simon', 65, TRUE);");
+        sendCommandToServer("INSERT INTO marks2 VALUES ('Sion', 55, TRUE);");
+        sendCommandToServer("INSERT INTO marks2 VALUES ('Rob', 35, FALSE);");
+        sendCommandToServer("INSERT INTO marks2 VALUES ('Chris', 20, FALSE);");
+
+        sendCommandToServer("DELETE FROM marks WHERE mark<40;");
+        sendCommandToServer("DELETE FROM marks WHERE mark>60;");
+        String response = sendCommandToServer("SELECT * FROM marks;");
+        System.out.println(response);
+    }
 }

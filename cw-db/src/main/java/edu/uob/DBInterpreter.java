@@ -242,7 +242,7 @@ public class DBInterpreter {
     }
 
     // based on the following definition:
-    // <Condition>  ::=  "(" <Condition> ")" | "(" <Condition> ")" <BoolOperator> <Condition> |
+    // <Condition>  ::=     "(" <Condition> ")"              | "(" <Condition> ")" <BoolOperator> <Condition> |
     //                      [PlainText] <Comparator> [Value] | [PlainText] <Comparator> [Value] <BoolOperator> <Condition>
     private List<List<String>> condition(List<String> headingsLC, List<List<String>> inputData) throws DBException {
         List<List<String>> outputData;
@@ -359,14 +359,14 @@ public class DBInterpreter {
         List<String> headings = table.getHeadings();
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
         List<List<String>> data = table.getData();
-        data = condition(headingsLC, data);
+        List<List<String>> filteredData = condition(headingsLC, data);
 
         // get the indices of the rows to be updated, use the table's method instead to update values
         List<String> idColumn = new ArrayList<>();
         for(List<String> rowData : data) idColumn.add(rowData.get(0));
         List<Integer> rowIndices = new ArrayList<>();
-        for(List<String> rowData : data) {
-            rowIndices.add(idColumn.indexOf(rowData.get(0)));
+        for(List<String> filteredRowData : filteredData) {
+            rowIndices.add(idColumn.indexOf(filteredRowData.get(0)));
         }
 
         table.update(rowIndices, nameValueList);
@@ -387,14 +387,14 @@ public class DBInterpreter {
         List<String> headings = table.getHeadings();
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
         List<List<String>> data = table.getData();
-        data = condition(headingsLC, data);
+        List<List<String>> filteredData = condition(headingsLC, data);
 
-        // get the indices of the rows to be deleted, use the table's method instead to delete values
+        // get the indices of the rows to be updated, use the table's method instead to update values
         List<String> idColumn = new ArrayList<>();
         for(List<String> rowData : data) idColumn.add(rowData.get(0));
         List<Integer> rowIndices = new ArrayList<>();
-        for(List<String> rowData : data) {
-            rowIndices.add(idColumn.indexOf(rowData.get(0)));
+        for(List<String> filteredRowData : filteredData) {
+            rowIndices.add(idColumn.indexOf(filteredRowData.get(0)));
         }
 
         table.delete(rowIndices);

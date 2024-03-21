@@ -56,6 +56,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT * FROM marks WHERE pass == TRUE;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        System.out.println();
 
         sendCommandToServer("CREATE TABLE coursework (task, submission);");
         sendCommandToServer("INSERT INTO coursework VALUES ('OXO', 2);");
@@ -65,10 +66,12 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT * FROM coursework;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        System.out.println();
 
         response = sendCommandToServer("JOIN coursework AND marks ON submission AND id;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Join query should be successful.");
+        System.out.println();
 
         response = sendCommandToServer("UPDATE marks SET mark = 38 WHERE name == 'Chris';");
         System.out.println(response);
@@ -76,6 +79,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT * FROM marks WHERE name == 'Chris';");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        System.out.println();
 
         response = sendCommandToServer("DELETE FROM marks WHERE name == 'Sion';");
         System.out.println(response);
@@ -83,6 +87,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT * FROM marks;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        System.out.println();
 
         response = sendCommandToServer("SELECT * FROM marks WHERE (pass == FALSE) AND (mark > 35);");
         System.out.println(response);
@@ -96,6 +101,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT name FROM marks WHERE mark>60;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        System.out.println();
 
         response = sendCommandToServer("DELETE FROM marks WHERE mark<40;");
         System.out.println(response);
@@ -103,6 +109,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT * FROM marks;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        System.out.println();
 
         response = sendCommandToServer("ALTER TABLE marks ADD age;");
         System.out.println(response);
@@ -110,6 +117,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT * FROM marks;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        System.out.println();
 
         response = sendCommandToServer("UPDATE marks SET age = 35 WHERE name == 'Simon';");
         System.out.println(response);
@@ -117,6 +125,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT * FROM marks;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        System.out.println();
 
         response = sendCommandToServer("ALTER TABLE marks DROP pass;");
         System.out.println(response);
@@ -124,6 +133,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT * FROM marks;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        System.out.println();
 
         response = sendCommandToServer("DROP TABLE marks;");
         System.out.println(response);
@@ -131,5 +141,6 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("DROP DATABASE " + TESTDATABASE + ";");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Drop query should be successful.");
+        System.out.println();
     }
 }

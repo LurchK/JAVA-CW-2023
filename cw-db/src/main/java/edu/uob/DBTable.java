@@ -19,12 +19,14 @@ public class DBTable {
         tableName = file.getName().toLowerCase().replaceAll(FILEEXTENSION, "");
         tableFile = new File(file.getParent(), tableName + FILEEXTENSION);
         if(tableFile.exists()) createError("file already exists");
+
         try{
             if(!tableFile.createNewFile()) createError("cannot create file");
         }
         catch(IOException e) {
             createError("IO exception " + e);
         }
+
         numOfRows = 0;
         numOfColumns = 1;
         headings = new ArrayList<>();
@@ -208,9 +210,11 @@ public class DBTable {
         for(int row : rows) {
             if(row<0 || row >= numOfRows) deleteError("invalid row index");
         }
+        List<List<String>> deleteData = new ArrayList<>();
         for(int row : rows) {
-            data.remove(row);
+            deleteData.add(data.get(row));
         }
+        data.removeAll(deleteData);
     }
 
     private void deleteError(String str) throws DBException {
