@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class Interpreter {
+public class DBInterpreter {
     private int cTok;
     private DBModel dbModel;
     private List<String> tokens;
     private String dataMessage;
 
-    public Interpreter(DBModel dbModel) {
+    public DBInterpreter(DBModel dbModel) {
         this.dbModel = dbModel;
         cTok = 0;
         dataMessage = "";

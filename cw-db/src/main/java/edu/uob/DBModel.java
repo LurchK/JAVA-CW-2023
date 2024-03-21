@@ -89,6 +89,7 @@ public class DBModel {
         DBDatabase database = databases.get(databaseName);
 
         try {
+            if(currentDatabase == database) currentDatabase = null;
             database.drop();
             databases.remove(databaseName);
         }

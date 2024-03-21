@@ -10,7 +10,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
 import java.nio.file.Files;
-import java.util.List;
 
 /** This class implements the DB server. */
 public class DBServer {
@@ -49,13 +48,13 @@ public class DBServer {
     */
     public String handleCommand(String command) {
         String message = "";
-        Tokenizer tokenizer = new Tokenizer(command);
+        DBTokenizer tokenizer = new DBTokenizer(command);
         tokenizer.tokenize();
         if(tokenizer.getTokens().get(0).isEmpty()) return message;
         try {
-            Parser parser = new Parser(tokenizer.getTokens());
+            DBParser parser = new DBParser(tokenizer.getTokens());
             if(!parser.parse()) throw new DBException(parser.getFailMessage());
-            Interpreter interpreter = new Interpreter(dbModel);
+            DBInterpreter interpreter = new DBInterpreter(dbModel);
             interpreter.interpret(tokenizer.getTokens());
             String dataMessage = interpreter.getDataMessage();
             message = "[OK]" + dataMessage;
@@ -101,5 +100,9 @@ public class DBServer {
                 writer.flush();
             }
         }
+    }
+
+    public DBModel getDBModel() {
+        return dbModel;
     }
 }

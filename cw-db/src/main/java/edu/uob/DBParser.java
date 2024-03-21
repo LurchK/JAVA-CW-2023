@@ -3,13 +3,13 @@ package edu.uob;
 
 import java.util.*;
 
-public class Parser {
+public class DBParser {
     private int cTok;
     private int failTok;
     private String failMessage;
     private List<String> tokens;
 
-    public Parser(List<String> tokens) {
+    public DBParser(List<String> tokens) {
         this.tokens = tokens;
         cTok = 0;
         failTok = 0;

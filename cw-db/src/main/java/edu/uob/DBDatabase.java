@@ -69,23 +69,6 @@ public class DBDatabase {
                 str);
     }
 
-    public void updateFiles() throws DBException {
-        for(DBTable table : tables.values()) {
-            try {
-                table.updateFile();
-            }
-            catch(DBException dbe) {
-                updateFilesError(dbe.getMessage());
-            }
-        }
-    }
-
-    private void updateFilesError(String str) throws DBException {
-        throw new DBException("failed to update table files in database " + databaseName + ":\n\t" +
-                databaseDir + ",\n\t" +
-                str);
-    }
-
     public void createTable(String tableName) throws DBException {
         if(tableName == null) createTableError("null input");
         if(tableName.isBlank()) createTableError("blank name");
