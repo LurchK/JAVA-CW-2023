@@ -104,6 +104,7 @@ public class DBInterpreter {
         if(tokens.get(cTok++).equalsIgnoreCase("(")) {
             List<String> attributeList = getAttributeList();
             for(String attribute : attributeList) {
+                checkName(attribute);
                 table.alterAdd(attribute);
             }
             table.updateFile();

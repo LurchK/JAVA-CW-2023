@@ -65,6 +65,7 @@ public class DBDatabase {
         if(!databaseDir.delete()) dropError("failed to delete path");
         databaseDir = null;
         databaseName = null;
+        tables = null;
     }
 
     private void dropError(String str) throws DBException {
