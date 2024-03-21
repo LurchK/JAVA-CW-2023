@@ -58,7 +58,7 @@ public class DBComplexConditionTests {
     @Test
     public void testLike() {
         String response = sendCommandToServer("SELECT * FROM employees WHERE " +
-                "salary <= 50000;");
+                "salary >= '50000';");
 
         System.out.println(response);
     }
