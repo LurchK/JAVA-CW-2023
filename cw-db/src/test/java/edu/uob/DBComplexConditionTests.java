@@ -57,9 +57,14 @@ public class DBComplexConditionTests {
 
     @Test
     public void testLike() {
-        String response = sendCommandToServer("SELECT * FROM employees WHERE " +
-                "salary >= '50000';");
+        String response = sendCommandToServer("SELECT * FROM employees WHERE salary like '50000';");
+        assertTrue(response.contains("[OK]"), "Like condition query should be successful.");
+        System.out.println(response);
+    }
 
+    @Test
+    public void testAlter() {
+        String response = sendCommandToServer("SELECT * FROM employees WHERE salary >= '50000';");
         System.out.println(response);
     }
 }

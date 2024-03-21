@@ -362,9 +362,11 @@ public class DBInterpreter {
         data = condition(headingsLC, data);
 
         // get the indices of the rows to be updated, use the table's method instead to update values
+        List<String> idColumn = new ArrayList<>();
+        for(List<String> rowData : data) idColumn.add(rowData.get(0));
         List<Integer> rowIndices = new ArrayList<>();
         for(List<String> rowData : data) {
-            rowIndices.add(Integer.parseInt(rowData.get(0)));
+            rowIndices.add(idColumn.indexOf(rowData.get(0)));
         }
 
         table.update(rowIndices, nameValueList);
@@ -388,9 +390,11 @@ public class DBInterpreter {
         data = condition(headingsLC, data);
 
         // get the indices of the rows to be deleted, use the table's method instead to delete values
+        List<String> idColumn = new ArrayList<>();
+        for(List<String> rowData : data) idColumn.add(rowData.get(0));
         List<Integer> rowIndices = new ArrayList<>();
         for(List<String> rowData : data) {
-            rowIndices.add(Integer.parseInt(rowData.get(0)));
+            rowIndices.add(idColumn.indexOf(rowData.get(0)));
         }
 
         table.delete(rowIndices);
