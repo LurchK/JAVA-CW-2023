@@ -5,6 +5,11 @@ import java.util.Comparator;
 import java.util.List;
 
 public class DBInterpreter {
+    private final static List<String> KEYWORDS = List.of(
+            ";","use","create","database","table","(",")", "drop","alter",
+            "insert","into","values","select","from","where","update","set", "delete",
+            "join","and","on",",","=","add","true","false","null","*","or",
+            "==",">","<",">=","<=","!=","like");
     private int cTok;
     private DBModel dbModel;
     private List<String> tokens;
@@ -25,6 +30,10 @@ public class DBInterpreter {
 
     public String getDataMessage() {
         return dataMessage;
+    }
+
+    private void checkName(String name) throws DBException {
+        if(KEYWORDS.contains(name.toLowerCase())) throw new DBException("name is a keyword");
     }
 
     public void interpret(List<String> tokens) throws DBException {
@@ -64,8 +73,10 @@ public class DBInterpreter {
     }
 
     private void use() throws DBException {
-        dbModel.use(tokens.get(cTok++));
+        String databaseName = tokens.get(cTok++);
+        dbModel.use(databaseName);
     }
+
     private void create() throws DBException {
         switch(tokens.get(cTok++).toLowerCase()) {
             case "database":
@@ -77,7 +88,9 @@ public class DBInterpreter {
     }
 
     private void createDatabase() throws DBException {
-        dbModel.createDatabase(tokens.get(cTok++));
+        String databaseName = tokens.get(cTok++);
+        checkName(databaseName);
+        dbModel.createDatabase(databaseName);
     }
 
     private void createTable() throws DBException {
@@ -85,6 +98,7 @@ public class DBInterpreter {
         if(database == null) throw new DBException("no database used");
 
         String tableName = tokens.get(cTok++);
+        checkName(tableName);
         database.createTable(tableName);
         DBTable table = database.getTable(tableName);
 
@@ -127,12 +141,15 @@ public class DBInterpreter {
         cTok++;
         String tableName = tokens.get(cTok++);
         DBTable table = database.getTable(tableName);
-        switch(tokens.get(cTok++).toLowerCase()) {
+        String type = tokens.get(cTok++).toLowerCase();
+        String attribute = tokens.get(cTok);
+        checkName(attribute);
+        switch(type) {
             case "add":
-                table.alterAdd(tokens.get(cTok));
+                table.alterAdd(attribute);
                 break;
             case "drop":
-                table.alterDrop(tokens.get(cTok));
+                table.alterDrop(attribute);
                 break;
         }
     }
@@ -359,6 +376,7 @@ public class DBInterpreter {
         DBDatabase database = dbModel.getCurrentDatabase();
         if(database == null) throw new DBException("no database used");
 
+        // get names and attributes
         String table1Name = tokens.get(cTok++);
         cTok++;
         String table2Name = tokens.get(cTok++);
@@ -369,6 +387,7 @@ public class DBInterpreter {
         String attribute2 = tokens.get(cTok++);
         String attribute2LC = attribute2.toLowerCase();
 
+        // get headings and data
         List<String> table1Headings = database.getTable(table1Name).getHeadings();
         List<String> table2Headings = database.getTable(table2Name).getHeadings();
         List<String> table1HeadingsLC = table1Headings.stream().map(String::toLowerCase).toList();
@@ -376,15 +395,28 @@ public class DBInterpreter {
         List<List<String>> table1Data = database.getTable(table1Name).getData();
         List<List<String>> table2Data = database.getTable(table2Name).getData();
 
+        // calculate the index to be joined for each table
         int table1ColumnIndex = table1HeadingsLC.indexOf(attribute1LC);
         int table2ColumnIndex = table2HeadingsLC.indexOf(attribute2LC);
 
+        // initialize the data for responding
+        List<List<String>> outputData = new ArrayList<>();
+        // now we can modify the headings to include the table name
+        table1Headings.replaceAll(s -> table1Name + s);
+        table1Headings.remove(table1ColumnIndex);
+        table2Headings.replaceAll(s -> table2Name + s);
+        table2Headings.remove(table2ColumnIndex);
+        table1Headings.addAll(table2Headings);
+        outputData.add(table1Headings);
+
+        // get the column of data from table 2
         List<String> table2Column = new ArrayList<>();
         for(List<String> table2Row : table2Data) {
             table2Column.add(table2Row.get(table2ColumnIndex));
         }
 
-        List<List<String>> outputData = new ArrayList<>();
+        // for each row in table 1, check if the value used for joining is contained by table 2
+        // then delete the joining columns and append that row of table 2 to this row of table 1
         for(List<String> table1Row : table1Data) {
             String table1Value = table1Row.get(table1ColumnIndex);
             int table2JoinIndex = table2Column.indexOf(table1Value);

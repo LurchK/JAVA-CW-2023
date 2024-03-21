@@ -31,6 +31,7 @@ public class DBTable {
         headings = new ArrayList<>();
         headings.add("id");
         data = new ArrayList<>();
+        updateFile();
     }
 
     private void createError(String str) throws DBException {
@@ -59,23 +60,23 @@ public class DBTable {
             if(!headings.get(0).equalsIgnoreCase("id")) loadError("incorrect file format");
 
             data = new ArrayList<>();
-            numOfRows = 0;
             for(line=buffReader.readLine(); line!=null; line=buffReader.readLine()) {
-                if(line.trim().equalsIgnoreCase(LINEOFDELETED)) {
-                    numOfRows++;
-                    continue;
-                }
                 String[] rowData = line.split(COLUMNDELIMITER);
-                if(rowData.length != numOfColumns || !rowData[0].matches("^ *[0-9]+ *$")) {
-                    continue;
+                if(rowData.length == 1 && rowData[0].matches("^ *[0-9]+ *$")) {
+                    numOfRows = Integer.parseInt(rowData[0]);
                 }
-                data.add(new ArrayList<>(List.of(rowData)));
-                numOfRows++;
+                if(rowData.length == numOfColumns && rowData[0].matches("^ *[0-9]+ *$")) {
+                    data.add(new ArrayList<>(List.of(rowData)));
+                }
             }
         }
         catch(IOException e) {
             loadError("IO exception" + e );
         }
+        catch(NumberFormatException nfe) {
+            loadError("corrupted file");
+        }
+
     }
 
     private void loadError(String str) throws DBException {
@@ -108,6 +109,7 @@ public class DBTable {
                 buffWriter.write(String.join(COLUMNDELIMITER, rowData));
                 buffWriter.newLine();
             }
+            buffWriter.write(String.valueOf(numOfRows));
         }
         catch (IOException ioe) {
             updateFileError("IO error");
@@ -207,7 +209,7 @@ public class DBTable {
             if(row<0 || row >= numOfRows) deleteError("invalid row index");
         }
         for(int row : rows) {
-            data.set(row, new ArrayList<>(List.of(LINEOFDELETED)));
+            data.remove(row);
         }
     }
 

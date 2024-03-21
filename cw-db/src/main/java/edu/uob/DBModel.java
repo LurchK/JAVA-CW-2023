@@ -90,8 +90,8 @@ public class DBModel {
 
         try {
             if(currentDatabase == database) currentDatabase = null;
-            database.drop();
             databases.remove(databaseName);
+            database.drop();
         }
         catch(DBException dbe) {
             dropDatabaseError(dbe.getMessage());

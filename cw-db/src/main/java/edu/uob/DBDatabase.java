@@ -58,6 +58,10 @@ public class DBDatabase {
     public void drop() throws DBException {
         if(!databaseDir.exists()) dropError("path does not exist");
         if(!databaseDir.canWrite()) dropError("doesn't have write permission");
+
+        for(DBTable table : tables.values()) {
+            table.drop();
+        }
         if(!databaseDir.delete()) dropError("failed to delete path");
         databaseDir = null;
         databaseName = null;
