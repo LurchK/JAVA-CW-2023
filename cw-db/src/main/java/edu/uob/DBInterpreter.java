@@ -454,7 +454,7 @@ public class DBInterpreter {
 
         // for each row in table 1, check if the value used for joining is contained by table 2
         // then delete the joining columns and append that row of table 2 to this row of table 1
-        int id = 0;
+        int id = 1;
         for(List<String> table1Row : table1Data) {
             String table1Value = table1Row.get(table1ColumnIndex);
             int table2JoinIndex = table2Column.indexOf(table1Value);

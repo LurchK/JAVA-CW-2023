@@ -27,7 +27,7 @@ public class DBTable {
             createError("IO exception " + e);
         }
 
-        numOfRows = 0;
+        numOfRows = 1;
         numOfColumns = 1;
         headings = new ArrayList<>();
         headings.add("id");

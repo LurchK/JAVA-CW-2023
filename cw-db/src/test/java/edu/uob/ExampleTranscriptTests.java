@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ExampleTranscriptTests {
 
@@ -71,6 +70,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("JOIN coursework AND marks ON submission AND id;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Join query should be successful.");
+        assertTrue(response.contains("coursework.task"), "headings should show table name.");
         System.out.println();
 
         response = sendCommandToServer("UPDATE marks SET mark = 38 WHERE name == 'Chris';");
@@ -79,6 +79,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT * FROM marks WHERE name == 'Chris';");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        assertTrue(response.contains("38"), "Update should be effective.");
         System.out.println();
 
         response = sendCommandToServer("DELETE FROM marks WHERE name == 'Sion';");
@@ -87,6 +88,7 @@ public class ExampleTranscriptTests {
         response = sendCommandToServer("SELECT * FROM marks;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"), "Select query should be successful.");
+        assertFalse(response.contains("Sion"), "Sion should be deleted.");
         System.out.println();
 
         response = sendCommandToServer("SELECT * FROM marks WHERE (pass == FALSE) AND (mark > 35);");
