@@ -67,8 +67,6 @@ public class DBInterpreter {
             case "join":
                 join();
                 break;
-            default:
-                throw new DBException("failed to interpret");
         }
     }
 
@@ -189,21 +187,29 @@ public class DBInterpreter {
         DBDatabase database = dbModel.getCurrentDatabase();
         if(database == null) throw new DBException("no database used");
 
+        // collect the wildAttribList
         List<String> wildAttribList = new ArrayList<>();
         do {
             wildAttribList.add(tokens.get(cTok++));
         }
         while(tokens.get(cTok++).equalsIgnoreCase(","));
 
+        // get the needed lists, also ensuring they are hard copies
         String tableName = tokens.get(cTok++);
-        List<String> headings = database.getTable(tableName).getHeadings();
+        List<String> headings = new ArrayList<>(database.getTable(tableName).getHeadings());
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
-        List<List<String>> data = database.getTable(tableName).getData();
+        List<List<String>> data = new ArrayList<>();
+        for(List<String> row : database.getTable(tableName).getData()) data.add(new ArrayList<>(row));
 
+        // filter the rows of data using conditions
         if(tokens.get(cTok++).equalsIgnoreCase("where")) {
             data = condition(headingsLC, data);
         }
 
+        // select columns to be included by firstly check if there is such an attribute
+        // then collect these attribute as output headings, and record the indices
+        // then for each row from data, add the needed column values to output data
+        // eventually, swap the names.
         if(!wildAttribList.contains("*")) {
             List<String> outputHeadings = new ArrayList<>();
             List<Integer> outputColumnIndices = new ArrayList<>();
@@ -232,8 +238,11 @@ public class DBInterpreter {
         writeDataMessage(output);
     }
 
+    // based on the following definition:
+    // <Condition>  ::=  "(" <Condition> ")" | "(" <Condition> ")" <BoolOperator> <Condition> |
+    //                      [PlainText] <Comparator> [Value] | [PlainText] <Comparator> [Value] <BoolOperator> <Condition>
     private List<List<String>> condition(List<String> headingsLC, List<List<String>> inputData) throws DBException {
-        List<List<String>> outputData = new ArrayList<>();
+        List<List<String>> outputData;
         if(tokens.get(cTok).equals("(")) {
             cTok++;
             outputData = condition(headingsLC, inputData);
@@ -268,7 +277,6 @@ public class DBInterpreter {
     private List<List<String>> compare(List<List<String>> inputData, int column, String comparator, String value) {
         String regexFloat = "^[-+]?[0-9]+.[0-9]+$";
         String regexInt = "^[-+]?[0-9]+$";
-        List<List<String>> returnData = new ArrayList<>();
         double fvalue = 0, fdataValue = 0;
 
         switch(comparator) {
@@ -286,6 +294,7 @@ public class DBInterpreter {
                         .toList();
         }
 
+        List<List<String>> returnData = new ArrayList<>();
         for (List<String> rowData : inputData) {
             if (value.matches(regexFloat) || value.matches(regexInt)) {
                 fvalue = Float.parseFloat(value);
@@ -321,9 +330,11 @@ public class DBInterpreter {
         DBDatabase database = dbModel.getCurrentDatabase();
         if(database == null) throw new DBException("no database used");
 
+        // get the table
         String tableName = tokens.get(cTok++);
         DBTable table = database.getTable(tableName);
 
+        // get NameValueList
         cTok++;
         List<List<String>> nameValueList = new ArrayList<>();
         do {
@@ -335,11 +346,13 @@ public class DBInterpreter {
         }
         while(tokens.get(cTok++).equalsIgnoreCase(","));
 
+        // get the headings and data, filter the rows of data with condition
         List<String> headings = table.getHeadings();
-        List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();;
+        List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
         List<List<String>> data = table.getData();
         data = condition(headingsLC, data);
 
+        // get the indices of the rows to be updated, use the table's method instead to update values
         List<Integer> rowIndices = new ArrayList<>();
         for(List<String> rowData : data) {
             rowIndices.add(Integer.parseInt(rowData.get(0)));
@@ -353,16 +366,19 @@ public class DBInterpreter {
         DBDatabase database = dbModel.getCurrentDatabase();
         if(database == null) throw new DBException("no database used");
 
+        // get the table
         cTok++;
         String tableName = tokens.get(cTok++);
         DBTable table = database.getTable(tableName);
         cTok++;
 
+        // get the headings and data of the table, filter the rows with conditions
         List<String> headings = table.getHeadings();
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();;
         List<List<String>> data = table.getData();
         data = condition(headingsLC, data);
 
+        // get the indices of the rows to be deleted, use the table's method instead to delete values
         List<Integer> rowIndices = new ArrayList<>();
         for(List<String> rowData : data) {
             rowIndices.add(Integer.parseInt(rowData.get(0)));
@@ -388,12 +404,15 @@ public class DBInterpreter {
         String attribute2LC = attribute2.toLowerCase();
 
         // get headings and data
-        List<String> table1Headings = database.getTable(table1Name).getHeadings();
-        List<String> table2Headings = database.getTable(table2Name).getHeadings();
+        List<String> table1Headings = new ArrayList<>(database.getTable(table1Name).getHeadings());
+        List<String> table2Headings = new ArrayList<>(database.getTable(table2Name).getHeadings());
         List<String> table1HeadingsLC = table1Headings.stream().map(String::toLowerCase).toList();
         List<String> table2HeadingsLC = table2Headings.stream().map(String::toLowerCase).toList();
-        List<List<String>> table1Data = database.getTable(table1Name).getData();
-        List<List<String>> table2Data = database.getTable(table2Name).getData();
+        // to ensure they are deep copies...
+        List<List<String>> table1Data = new ArrayList<>();
+        for(List<String> row : database.getTable(table1Name).getData()) table1Data.add(new ArrayList<>(row));
+        List<List<String>> table2Data = new ArrayList<>();
+        for(List<String> row : database.getTable(table2Name).getData()) table2Data.add(new ArrayList<>(row));
 
         // calculate the index to be joined for each table
         int table1ColumnIndex = table1HeadingsLC.indexOf(attribute1LC);
@@ -402,9 +421,9 @@ public class DBInterpreter {
         // initialize the data for responding
         List<List<String>> outputData = new ArrayList<>();
         // now we can modify the headings to include the table name
-        table1Headings.replaceAll(s -> table1Name + s);
+        table1Headings.replaceAll(s -> table1Name + "." + s);
         table1Headings.remove(table1ColumnIndex);
-        table2Headings.replaceAll(s -> table2Name + s);
+        table2Headings.replaceAll(s -> table2Name + "." + s);
         table2Headings.remove(table2ColumnIndex);
         table1Headings.addAll(table2Headings);
         outputData.add(table1Headings);
@@ -423,6 +442,7 @@ public class DBInterpreter {
             if(table2JoinIndex!=-1) {
                 table1Row.remove(table1ColumnIndex);
                 List<String> table2Row = table2Data.get(table2JoinIndex);
+                System.out.println(table1Row);
                 table2Row.remove(table2ColumnIndex);
                 table1Row.addAll(table2Row);
                 outputData.add(table1Row);
