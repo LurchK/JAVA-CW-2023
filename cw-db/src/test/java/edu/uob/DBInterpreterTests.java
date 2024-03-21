@@ -56,12 +56,12 @@ public class DBInterpreterTests {
     public void testJoinUsingSameTable() {
         sendCommandToServer("CREATE DATABASE " + TESTDATABASE + ";");
         sendCommandToServer("USE " + TESTDATABASE + ";");
-        sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
+        sendCommandToServer("CREATE TABLE marks (Name, Mark, Pass);");
         sendCommandToServer("INSERT INTO marks VALUES ('Simon', 65, TRUE);");
         sendCommandToServer("INSERT INTO marks VALUES ('Sion', 55, TRUE);");
         sendCommandToServer("INSERT INTO marks VALUES ('Rob', 35, FALSE);");
         sendCommandToServer("INSERT INTO marks VALUES ('Chris', 20, FALSE);");
-        sendCommandToServer("CREATE TABLE marks2 (name, mark, pass);");
+        sendCommandToServer("CREATE TABLE marks2 (Name, Mark, Pass);");
         sendCommandToServer("INSERT INTO marks2 VALUES ('Simon', 65, TRUE);");
         sendCommandToServer("INSERT INTO marks2 VALUES ('Sion', 55, TRUE);");
         sendCommandToServer("INSERT INTO marks2 VALUES ('Rob', 35, FALSE);");

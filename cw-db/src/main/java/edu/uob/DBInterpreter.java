@@ -218,9 +218,10 @@ public class DBInterpreter {
             List<List<String>> outputData = new ArrayList<>();
             for(String attribute : wildAttribList) {
                 String attributeLC = attribute.toLowerCase();
-                if(headingsLC.contains(attributeLC)) {
-                    outputHeadings.add(attribute);
-                    outputColumnIndices.add(headingsLC.indexOf(attributeLC));
+                int index = headingsLC.indexOf(attributeLC);
+                if(index!=-1) {
+                    outputHeadings.add(headings.get(index));
+                    outputColumnIndices.add(index);
                 }
             }
             for(List<String> rowData : data) {
