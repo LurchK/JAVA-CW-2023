@@ -8,7 +8,6 @@ public class DBTable {
     private String tableName;
     public final static String FILEEXTENSION = ".tab";
     public final static String COLUMNDELIMITER = "\t";
-    public final static String LINEOFDELETED = "DELETED";
     public final static String EMPTY = "NULL";
     private int numOfRows;
     private int numOfColumns;

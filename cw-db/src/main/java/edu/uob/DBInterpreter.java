@@ -196,7 +196,7 @@ public class DBInterpreter {
         }
         while(tokens.get(cTok++).equalsIgnoreCase(","));
 
-        // get the needed lists, also ensuring they are hard copies
+        // get the needed lists, also ensuring they are deep copies
         String tableName = tokens.get(cTok++);
         List<String> headings = new ArrayList<>(database.getTable(tableName).getHeadings());
         List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
@@ -303,32 +303,32 @@ public class DBInterpreter {
                 return returnData;
         }
 
-        double fvalue, fdataValue;
+        double fValue, fDataValue;
         for (List<String> rowData : inputData) {
             if (value.matches(regexFloat) || value.matches(regexInt)) {
-                fvalue = Float.parseFloat(value);
+                fValue = Float.parseFloat(value);
             } else {
                 continue;
             }
             String dataValue = rowData.get(column);
             if (dataValue.matches(regexFloat) || dataValue.matches(regexInt)) {
-                fdataValue = Float.parseFloat(dataValue);
+                fDataValue = Float.parseFloat(dataValue);
             } else {
                 continue;
             }
 
             switch (comparator) {
                 case ">=":
-                    if (fdataValue >= fvalue) returnData.add(rowData);
+                    if (fDataValue >= fValue) returnData.add(rowData);
                     break;
                 case "<=":
-                    if (fdataValue <= fvalue) returnData.add(rowData);
+                    if (fDataValue <= fValue) returnData.add(rowData);
                     break;
                 case ">":
-                    if (fdataValue > fvalue) returnData.add(rowData);
+                    if (fDataValue > fValue) returnData.add(rowData);
                     break;
                 case "<":
-                    if (fdataValue < fvalue) returnData.add(rowData);
+                    if (fDataValue < fValue) returnData.add(rowData);
                     break;
             }
         }
@@ -383,7 +383,7 @@ public class DBInterpreter {
 
         // get the headings and data of the table, filter the rows with conditions
         List<String> headings = table.getHeadings();
-        List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();;
+        List<String> headingsLC = headings.stream().map(String::toLowerCase).toList();
         List<List<String>> data = table.getData();
         data = condition(headingsLC, data);
 
@@ -430,12 +430,17 @@ public class DBInterpreter {
         // initialize the data for responding
         List<List<String>> outputData = new ArrayList<>();
         // now we can modify the headings to include the table name
+        // and join them, with the first column being id
         table1Headings.replaceAll(s -> table1Name + "." + s);
         table1Headings.remove(table1ColumnIndex);
+        if(table1ColumnIndex != 0) table1Headings.remove(0);
         table2Headings.replaceAll(s -> table2Name + "." + s);
         table2Headings.remove(table2ColumnIndex);
-        table1Headings.addAll(table2Headings);
-        outputData.add(table1Headings);
+        if(table2ColumnIndex != 0) table2Headings.remove(0);
+        List<String> outputHeadings = new ArrayList<>(List.of("id"));
+        outputHeadings.addAll(table1Headings);
+        outputHeadings.addAll(table2Headings);
+        outputData.add(outputHeadings);
 
         // get the column of data from table 2
         List<String> table2Column = new ArrayList<>();
@@ -445,15 +450,20 @@ public class DBInterpreter {
 
         // for each row in table 1, check if the value used for joining is contained by table 2
         // then delete the joining columns and append that row of table 2 to this row of table 1
+        int id = 0;
         for(List<String> table1Row : table1Data) {
             String table1Value = table1Row.get(table1ColumnIndex);
             int table2JoinIndex = table2Column.indexOf(table1Value);
             if(table2JoinIndex!=-1) {
                 table1Row.remove(table1ColumnIndex);
+                if(table1ColumnIndex != 0) table1Row.remove(0);
                 List<String> table2Row = table2Data.get(table2JoinIndex);
                 table2Row.remove(table2ColumnIndex);
-                table1Row.addAll(table2Row);
-                outputData.add(table1Row);
+                if(table2ColumnIndex != 0) table2Row.remove(0);
+                List<String> outputRow = new ArrayList<>(List.of(String.valueOf(id++)));
+                outputRow.addAll(table1Row);
+                outputRow.addAll(table2Row);
+                outputData.add(outputRow);
             }
         }
         writeDataMessage(outputData);
