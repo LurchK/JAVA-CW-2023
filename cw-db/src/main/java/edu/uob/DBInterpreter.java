@@ -82,6 +82,7 @@ public class DBInterpreter {
                 break;
             case "table":
                 createTable();
+                break;
         }
     }
 
@@ -129,6 +130,7 @@ public class DBInterpreter {
                 if(database == null) throw new DBException("no database used");
 
                 database.dropTable(tokens.get(cTok));
+                break;
         }
     }
 
@@ -259,16 +261,19 @@ public class DBInterpreter {
             outputData = compare(inputData, column, comparator, value);
         }
 
-        String boolOperator = tokens.get(cTok++).toLowerCase();
+        String boolOperator = tokens.get(cTok).toLowerCase();
         switch(boolOperator) {
             case "and":
+                cTok++;
                 outputData = condition(headingsLC, outputData);
                 break;
             case "or":
+                cTok++;
                 List<List<String>> outputData2 = condition(headingsLC, inputData);
                 outputData2.removeAll(outputData);
                 outputData.addAll(outputData2);
-                outputData.sort(Comparator.comparing(l -> l.get(0)));
+                outputData.sort(Comparator.comparing(l -> Integer.parseInt(l.get(0))));
+                break;
         }
         return outputData;
 
@@ -277,24 +282,27 @@ public class DBInterpreter {
     private List<List<String>> compare(List<List<String>> inputData, int column, String comparator, String value) {
         String regexFloat = "^[-+]?[0-9]+.[0-9]+$";
         String regexInt = "^[-+]?[0-9]+$";
-        double fvalue = 0, fdataValue = 0;
+        List<List<String>> returnData = new ArrayList<>();
 
         switch(comparator) {
             case "==":
-                return inputData.stream()
-                        .filter(list -> list.get(column).equals(value))
-                        .toList();
+                for(List<String> rowData : inputData) {
+                    if(rowData.get(column).equals(value)) returnData.add(rowData);
+                }
+                return returnData;
             case "like":
-                return inputData.stream()
-                        .filter(list -> list.get(column).matches(value))
-                        .toList();
+                for(List<String> rowData : inputData) {
+                    if(rowData.get(column).matches(value)) returnData.add(rowData);
+                }
+                return returnData;
             case "!=":
-                return inputData.stream()
-                        .filter(list -> !list.get(column).equals(value))
-                        .toList();
+                for(List<String> rowData : inputData) {
+                    if(!rowData.get(column).equals(value)) returnData.add(rowData);
+                }
+                return returnData;
         }
 
-        List<List<String>> returnData = new ArrayList<>();
+        double fvalue, fdataValue;
         for (List<String> rowData : inputData) {
             if (value.matches(regexFloat) || value.matches(regexInt)) {
                 fvalue = Float.parseFloat(value);
