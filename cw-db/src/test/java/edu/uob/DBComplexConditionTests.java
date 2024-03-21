@@ -58,8 +58,7 @@ public class DBComplexConditionTests {
     @Test
     public void testLike() {
         String response = sendCommandToServer("SELECT * FROM employees WHERE " +
-                "(((department == 'IT' AND age < 40 AND active == TRUE) OR " +
-                "(department == 'Sales' AND salary > 65000)) AND id != '1' )OR name like 'A';");
+                "salary <= 50000;");
 
         System.out.println(response);
     }

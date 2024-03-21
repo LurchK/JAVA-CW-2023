@@ -52,7 +52,7 @@ public class DBTokenizer {
 
     private String reformLogicalOperators(String input) {
         for(String op : compositeLogicalOperators) {
-            input = input.replace(op.charAt(0) + " " + op.charAt(1), " " + op + " ");
+            input = input.replace(op.charAt(0) + " " + op.charAt(1), op);
         }
         return input;
     }
