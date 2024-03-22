@@ -183,6 +183,9 @@ public class DBInterpreter {
         if(value.matches("^'.*'$")){
             value = value.substring(1, value.length()-1);
         }
+        else {
+            value = value.toUpperCase();
+        }
         return value;
     }
 

@@ -100,6 +100,8 @@ public class DBInterpreterTests {
         System.out.println(response);
         response = sendCommandToServer("SELECT * FROM marks WHERE name == '';");
         System.out.println(response);
+        response = sendCommandToServer("SELECT * FROM marks WHERE pass == true;");
+        System.out.println(response);
     }
 
     @Test
