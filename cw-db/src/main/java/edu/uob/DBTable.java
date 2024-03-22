@@ -8,7 +8,7 @@ public class DBTable {
     private String tableName;
     public final static String FILEEXTENSION = ".tab";
     public final static String COLUMNDELIMITER = "\t";
-    public final static String EMPTY = "NULL";
+    public final static String EMPTY = "";
     private int numOfRows;
     private int numOfColumns;
     private List<String> headings;
@@ -193,7 +193,7 @@ public class DBTable {
             for(List<String> nameValuePair : nameValueList) {
                 String key = nameValuePair.get(0);
                 String value = nameValuePair.get(1);
-                if(value == null) value = "NULL";
+                if(value == null) value = EMPTY;
                 int column = headingsLC.indexOf(key.toLowerCase());
                 data.get(row).set(column, value);
             }
