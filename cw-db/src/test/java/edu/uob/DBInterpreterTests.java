@@ -114,18 +114,21 @@ public class DBInterpreterTests {
 
     @Test
     public void testUpdate() {
-        sendCommandToServer("UPDATE marks SET mark = 0 WHERE name == 'Simon';");
+        sendCommandToServer("UPDATE marks SET mark=0 WHERE name == 'Simon';");
         String response = sendCommandToServer("SELECT * FROM marks;");
-        assertTrue(response.contains("[OK]"), "");
         System.out.println(response);
+        assertTrue(response.contains("[OK]"), "");
+        response = sendCommandToServer("UPDATE marks SET id = 0 WHERE name == 'Simon';");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR]"), "");
     }
 
     @Test
     public void testDelete() {
         String response = sendCommandToServer("SELECT * FROM marks;");
         System.out.println(response);
-        sendCommandToServer("DELETE FROM marks WHERE mark<35;");
-        sendCommandToServer("DELETE FROM marks WHERE id>0;");
+        sendCommandToServer("DELETE FROM marks WHERE mark<=35;");
+        sendCommandToServer("DELETE FROM marks WHERE id>3;");
         response = sendCommandToServer("SELECT * FROM marks;");
         System.out.println(response);
     }
@@ -138,6 +141,9 @@ public class DBInterpreterTests {
         assertFalse(response.contains("[ERROR]"), "A valid query was made, however an [ERROR] tag was returned");
         assertTrue(response.contains("Simon"), "An attempt was made to add Simon to the table, but they were not returned by SELECT *");
         assertTrue(response.contains("Chris"), "An attempt was made to add Chris to the table, but they were not returned by SELECT *");
+
+        response = sendCommandToServer("JOIN marks AND marks ON name AND name;");
+        System.out.println(response);
 
         sendCommandToServer("DELETE FROM marks WHERE ID<3;");
         response = sendCommandToServer("JOIN marks AND marks2 ON id AND id;");
