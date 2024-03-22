@@ -52,11 +52,45 @@ public class DBInterpreterTests {
     public void testCreate() {
         String response = sendCommandToServer("CREATE TABLE new (like);");
         assertTrue(response.contains("[ERROR]"), "");
+        sendCommandToServer("DROP TABLE new;");
+        response = sendCommandToServer("CREATE TABLE new (ok);");
+        assertTrue(response.contains("[OK]"), "");
+        sendCommandToServer("DROP TABLE new;");
+        response = sendCommandToServer("CREATE TABLE new (1,2,3,4,a,b,c,d,E,F,G,1a,a1,11,aa);");
+        assertTrue(response.contains("[OK]"), "");
+        sendCommandToServer("DROP TABLE new;");
+        response = sendCommandToServer("CREATE TABLE new (ok);;");
+        assertTrue(response.contains("[ERROR]"), "");
+    }
+
+    @Test
+    public void testDrop() {
+        String response = sendCommandToServer("DROP TABLE marks;");
+        assertTrue(response.contains("[OK]"), "");
+        response = sendCommandToServer("SELECT * FROM TABLE marks;");
+        assertTrue(response.contains("[ERROR]"), "");
+        response = sendCommandToServer("DROP TABLE marks;");
+        assertTrue(response.contains("[ERROR]"), "");
+        response = sendCommandToServer("DROP DATABASE test;");
+        assertTrue(response.contains("[OK]"), "");
+        response = sendCommandToServer("SELECT * FROM marks2;");
+        assertTrue(response.contains("[ERROR]"), "");
     }
 
     @Test
     public void testAlter() {
-        sendCommandToServer("ALTER TABLE marks ADD ('', '', '');");
+        String response = sendCommandToServer("ALTER TABLE marks ADD hello;");
+        assertTrue(response.contains("[OK]"), "");
+        response = sendCommandToServer("UPDATE marks SET hello='hello' WHERE id==1;");
+        assertTrue(response.contains("[OK]"), "");
+        response = sendCommandToServer("SELECT * FROM marks;");
+        System.out.println(response);
+        response = sendCommandToServer("ALTER TABLE marks ADD hello;");
+        assertTrue(response.contains("[ERROR]"), "");
+        response = sendCommandToServer("ALTER TABLE marks ADD ID;");
+        assertTrue(response.contains("[ERROR]"), "");
+        response = sendCommandToServer("ALTER TABLE marks ADD true;");
+        assertTrue(response.contains("[ERROR]"), "");
     }
 
     @Test
@@ -102,5 +136,12 @@ public class DBInterpreterTests {
         assertFalse(response.contains("[ERROR]"), "A valid query was made, however an [ERROR] tag was returned");
         assertTrue(response.contains("Simon"), "An attempt was made to add Simon to the table, but they were not returned by SELECT *");
         assertTrue(response.contains("Chris"), "An attempt was made to add Chris to the table, but they were not returned by SELECT *");
+
+        sendCommandToServer("DELETE FROM marks WHERE ID<3;");
+        response = sendCommandToServer("JOIN marks AND marks2 ON id AND id;");
+        System.out.println(response);
+        sendCommandToServer("DELETE FROM marks WHERE ID>0;");
+        response = sendCommandToServer("JOIN marks AND marks2 ON id AND id;");
+        System.out.println(response);
     }
 }

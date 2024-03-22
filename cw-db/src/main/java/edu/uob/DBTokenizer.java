@@ -6,8 +6,8 @@ public class DBTokenizer {
     private List<String> tokens;
     private String tokenStr;
     private String[] specialCharacters = {"(",")",",",";"};
-    private String[] unaryLogicalOperators = {">","<","==","!="};
-    private String[] compositeLogicalOperators = {">=","<="};
+    private String[] singleOperators = {">","<","=","!"};
+    private String[] compositeOperators = {">=","<=","==","!="};
 
     public DBTokenizer(String str) {
         tokens = new ArrayList<>();
@@ -29,9 +29,9 @@ public class DBTokenizer {
     private String[] tokenizeFragment(String input)
     {
         input = expandSpecialCharacters(input);
-        input = expandLogicalOperators(input);
+        input = expandSingleOperators(input);
         while (input.contains("  ")) input = input.replaceAll("  ", " ");
-        input = reformLogicalOperators(input);
+        input = reformCompositeOperators(input);
         input = input.trim();
         return input.split(" ");
     }
@@ -43,15 +43,15 @@ public class DBTokenizer {
         return input;
     }
 
-    private String expandLogicalOperators(String input) {
-        for(String op : unaryLogicalOperators) {
+    private String expandSingleOperators(String input) {
+        for(String op : singleOperators) {
             input = input.replace(op, " " + op + " ");
         }
         return input;
     }
 
-    private String reformLogicalOperators(String input) {
-        for(String op : compositeLogicalOperators) {
+    private String reformCompositeOperators(String input) {
+        for(String op : compositeOperators) {
             input = input.replace(op.charAt(0) + " " + op.charAt(1), op);
         }
         return input;

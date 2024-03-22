@@ -351,7 +351,7 @@ public class DBInterpreter {
             List<String> nameValuePair = new ArrayList<>();
             nameValuePair.add(tokens.get(cTok++));
             cTok++;
-            nameValuePair.add(tokens.get(cTok++));
+            nameValuePair.add(getValue());
             nameValueList.add(nameValuePair);
         }
         while(tokens.get(cTok++).equalsIgnoreCase(","));
