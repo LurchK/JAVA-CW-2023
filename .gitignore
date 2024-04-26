@@ -18,3 +18,8 @@ BNF_parser_focused.txt
 cw-db/src/main/java/edu/uob/Development.java
 Development.java
 /cw-stag/.idea
+/cw-stag/target
+cw-stag/startBoth.bat
+cw-stag/startGameClientAsKelvin.bat
+cw-stag/startGameClientAsPlayer2.bat
+cw-stag/startGameServer.bat
