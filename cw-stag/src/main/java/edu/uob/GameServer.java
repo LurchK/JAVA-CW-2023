@@ -1,14 +1,9 @@
 package edu.uob;
 
-import com.alexmerz.graphviz.ParseException;
-import com.alexmerz.graphviz.Parser;
-import com.alexmerz.graphviz.objects.Graph;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
-import java.util.*;
 
 public final class GameServer {
 
@@ -35,7 +30,6 @@ public final class GameServer {
         entitiesParser.parse(model, entitiesFile);
         GameActionsParser actionsParser = new GameActionsParser();
         actionsParser.parse(model, actionsFile);
-
     }
 
     /**

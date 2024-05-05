@@ -78,7 +78,7 @@ public class GameActionsParser {
         }
 
         setNarration((Element) narrationElements.item(0));
-        
+
         for (String trigger:gameAction.getTriggers()) {
             if(gameActions.containsKey(trigger)) {
                 gameActions.get(trigger).add(gameAction);
