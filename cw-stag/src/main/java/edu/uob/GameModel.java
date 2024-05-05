@@ -1,15 +1,15 @@
 package edu.uob;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GameModel {
+    private List<String> reservedWords;
     private Map<String, GameEntity> entities;
     private String startLocation;
     private Map<String, Set<GameAction>> actions;
 
     public GameModel() {
+        reservedWords = new LinkedList<>(Arrays.asList("inventory","inv","get","drop","goto","look"));
         entities = new HashMap<>();
         actions = new HashMap<>();
         startLocation = null;
@@ -25,5 +25,17 @@ public class GameModel {
 
     public void setStartLocation(String startLocation) {
         this.startLocation = startLocation;
+    }
+
+    public Map<String, GameEntity> getEntities() {
+        return entities;
+    }
+
+    public Map<String, Set<GameAction>> getActions() {
+        return actions;
+    }
+
+    public String getStartLocation() {
+        return startLocation;
     }
 }

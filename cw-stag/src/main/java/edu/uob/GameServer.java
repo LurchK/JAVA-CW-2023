@@ -33,7 +33,8 @@ public final class GameServer {
         model = new GameModel();
         GameEntitiesParser entitiesParser = new GameEntitiesParser();
         entitiesParser.parse(model, entitiesFile);
-
+        GameActionsParser actionsParser = new GameActionsParser();
+        actionsParser.parse(model, actionsFile);
 
     }
 
