@@ -23,3 +23,4 @@ cw-stag/startBoth.bat
 cw-stag/startGameClientAsKelvin.bat
 cw-stag/startGameClientAsPlayer2.bat
 cw-stag/startGameServer.bat
+cw-stag/recompile.bat

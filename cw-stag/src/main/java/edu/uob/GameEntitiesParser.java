@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class GameEntitiesParser {
+    private GameModel model;
     private Map<String, GameEntity> entities;
     private String startLocation;
 
@@ -22,6 +23,7 @@ public class GameEntitiesParser {
         startLocation = null;
     }
     public void parse(GameModel model, File entitiesFile) {
+        this.model = model;
         Parser parser = new Parser();
         try {
             parser.parse(new FileReader(entitiesFile));
@@ -53,6 +55,13 @@ public class GameEntitiesParser {
         model.setStartLocation(startLocation);
     }
 
+    private void checkNameIfReserved(String name) {
+        if(model.getReservedWords().contains(name)) {
+            System.err.println("Entity name '" + name + "' is a reserved key word!");
+            System.exit(1);
+        }
+    }
+
     private void parseLocations(Graph locationsGraph) {
         List<Graph> locationGraphs = locationsGraph.getSubgraphs();
         if(locationGraphs.size() < 2) {
@@ -66,7 +75,8 @@ public class GameEntitiesParser {
                 System.exit(1);
             }
             Node node = nodes.get(0);
-            String name = node.getId().getId();
+            String name = node.getId().getId().toLowerCase();
+            checkNameIfReserved(name);
             if(name.isEmpty()) {
                 System.err.println("Empty name for location!");
                 System.exit(1);
@@ -88,8 +98,8 @@ public class GameEntitiesParser {
     private void parsePaths(Graph pathsGraph) {
         List<Edge> edges = pathsGraph.getEdges();
         for(Edge edge:edges) {
-            String sourceName = edge.getSource().getNode().getId().getId();
-            String targetName = edge.getTarget().getNode().getId().getId();
+            String sourceName = edge.getSource().getNode().getId().getId().toLowerCase();
+            String targetName = edge.getTarget().getNode().getId().getId().toLowerCase();
             if(entities.get(sourceName)==null || entities.get(targetName)==null) {
                 System.err.println("Location not existed for a path.");
                 System.exit(1);
@@ -108,10 +118,11 @@ public class GameEntitiesParser {
     private void parseLocationEntities(GameEntityLocation location, Graph locationGraph) {
         List<Graph> locationEntitiesGraphs = locationGraph.getSubgraphs();
         for(Graph graph:locationEntitiesGraphs) {
-            String type = graph.getId().getId();
+            String type = graph.getId().getId().toLowerCase();
             List<Node> nodes = graph.getNodes(true);
             for(Node node:nodes) {
-                String name = node.getId().getId();
+                String name = node.getId().getId().toLowerCase();
+                checkNameIfReserved(name);
                 String description = node.getAttribute("description");
                 GameEntity entity = null;
                 switch (type) {
@@ -122,6 +133,7 @@ public class GameEntitiesParser {
                         System.err.println("Invalid entity type for location!");
                         System.exit(1);
                 }
+                entity.setCurrentLocation(location);
                 location.addEntity(entity);
                 entities.put(name, entity);
             }

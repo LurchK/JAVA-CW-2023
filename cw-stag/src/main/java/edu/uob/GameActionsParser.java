@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class GameActionsParser {
-    private Map<String, Set<GameAction>> gameActions;
-    private GameAction gameAction;
+    private Map<String, Set<GameActionExternal>> gameActions;
+    private GameActionExternal gameActionExternal;
     private GameModel model;
     private File actionsFile;
     public GameActionsParser() {
@@ -45,8 +45,15 @@ public class GameActionsParser {
         model.setActions(gameActions);
     }
 
+    private void checkNameIfReserved(String name) {
+        if(model.getReservedWords().contains(name)) {
+            System.err.println("Action used name '" + name + "' is a reserved key word!");
+            System.exit(1);
+        }
+    }
+
     private void addAction(Element actionElement) {
-        gameAction = new GameAction();
+        gameActionExternal = new GameActionExternal();
         NodeList triggerElements = actionElement.getElementsByTagName("triggers");
         if(triggerElements.getLength() == 0) {
             System.err.println("No trigger in an action!");
@@ -79,13 +86,13 @@ public class GameActionsParser {
 
         setNarration((Element) narrationElements.item(0));
 
-        for (String trigger:gameAction.getTriggers()) {
+        for (String trigger: gameActionExternal.getTriggers()) {
             if(gameActions.containsKey(trigger)) {
-                gameActions.get(trigger).add(gameAction);
+                gameActions.get(trigger).add(gameActionExternal);
             }
             else {
-                Set<GameAction> newSet = new HashSet<>();
-                newSet.add(gameAction);
+                Set<GameActionExternal> newSet = new HashSet<>();
+                newSet.add(gameActionExternal);
                 gameActions.put(trigger, newSet);
             }
         }
@@ -96,11 +103,12 @@ public class GameActionsParser {
         int triggersLength = keyphrases.getLength();
         for(int i=0; i<triggersLength; i++) {
             String keyphrase = keyphrases.item(i).getTextContent().toLowerCase();
+            checkNameIfReserved(keyphrase);
             if(keyphrase.isBlank()) {
                 System.err.println("Blank key phrase for a trigger!");
                 System.exit(1);
             }
-            gameAction.addTrigger(keyphrase);
+            gameActionExternal.addTrigger(keyphrase);
         }
     }
 
@@ -110,6 +118,7 @@ public class GameActionsParser {
         int subjectsLength = subjectEntities.getLength();
         for(int i=0; i<subjectsLength; i++) {
             String entityName = subjectEntities.item(i).getTextContent().toLowerCase();
+            checkNameIfReserved(entityName);
             if(entityName.isBlank()) {
                 System.err.println("Blank name for a subject!");
                 System.exit(1);
@@ -119,7 +128,7 @@ public class GameActionsParser {
                 System.err.println("Subject with name '" + entityName + "' doesn't exist!");
                 System.exit(1);
             }
-            gameAction.addSubject(entityName);
+            gameActionExternal.addSubject(entityName);
         }
     }
 
@@ -129,6 +138,7 @@ public class GameActionsParser {
         int consumedLength = consumedEntities.getLength();
         for(int i=0; i<consumedLength; i++) {
             String entityName = consumedEntities.item(i).getTextContent().toLowerCase();
+            checkNameIfReserved(entityName);
             if(entityName.isBlank()) {
                 System.err.println("Blank name for a consumed entity!");
                 System.exit(1);
@@ -138,7 +148,7 @@ public class GameActionsParser {
                 System.err.println("Consumed entity with name '" + entityName + "' doesn't exist!");
                 System.exit(1);
             }
-            gameAction.addConsumed(entityName);
+            gameActionExternal.addConsumed(entityName);
         }
     }
 
@@ -148,6 +158,7 @@ public class GameActionsParser {
         int producedLength = producedEntities.getLength();
         for(int i=0; i<producedLength; i++) {
             String entityName = producedEntities.item(i).getTextContent().toLowerCase();
+            checkNameIfReserved(entityName);
             if(entityName.isBlank()) {
                 System.err.println("Blank name for a produced entity!");
                 System.exit(1);
@@ -157,11 +168,11 @@ public class GameActionsParser {
                 System.err.println("Produced entity with name '" + entityName + "' doesn't exist!");
                 System.exit(1);
             }
-            gameAction.addProduced(entityName);
+            gameActionExternal.addProduced(entityName);
         }
     }
 
     private void setNarration(Element narration) {
-        gameAction.setNarration(narration.getTextContent());
+        gameActionExternal.setNarration(narration.getTextContent());
     }
 }
