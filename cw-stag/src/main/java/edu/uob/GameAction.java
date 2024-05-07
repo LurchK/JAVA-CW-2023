@@ -39,7 +39,8 @@ abstract public class GameAction {
         for (String subject:subjects) {
             if (subject.equals("health")) continue;
             if (subject.equals(currentLocation.getName())) continue;
-            if (currentLocation.containsEntity(subject)) continue;
+            if (player.getEntities().containsKey(subject)) continue;
+            if (currentLocation.isEntityAvailable(subject)) continue;
             if (locationPaths.containsKey(subject)) continue;
             return false;
         }

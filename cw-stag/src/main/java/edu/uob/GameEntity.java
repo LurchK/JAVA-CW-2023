@@ -46,12 +46,13 @@ abstract public class GameEntity
         return entities;
     }
 
-    public boolean containsEntity(String inputEntityName) {
+    public boolean isEntityAvailable(String inputEntityName) {
         if (entities.containsKey(inputEntityName)) {
             return true;
         }
         for (GameEntity entity:entities.values()) {
-            if (entity.containsEntity(inputEntityName)) {
+            if (entity instanceof GameEntityPlayer) continue;
+            if (entity.isEntityAvailable(inputEntityName)) {
                 return true;
             }
         }
