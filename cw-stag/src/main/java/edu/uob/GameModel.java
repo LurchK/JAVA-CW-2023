@@ -9,7 +9,7 @@ public class GameModel {
     private Map<String, Set<GameAction>> actions;
 
     public GameModel() {
-        reservedWords = new LinkedList<>(Arrays.asList("inventory","inv","get","drop","goto","look"));
+        reservedWords = new LinkedList<>(Arrays.asList("inventory","inv","get","drop","goto","look","health"));
         entities = new HashMap<>();
         actions = new HashMap<>();
         startLocation = null;
