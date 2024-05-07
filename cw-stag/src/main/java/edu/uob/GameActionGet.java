@@ -27,13 +27,13 @@ public class GameActionGet extends GameAction {
         GameEntityLocation playerLocation = (GameEntityLocation) player.getCurrentLocation();
         GameEntity entity = playerLocation.getEntities().get(actionEntityName);
         if (entity == null) {
-            return "The '" + actionEntityName + "' is not here.";
+            return "The " + actionEntityName + " is not here.";
         }
 
         playerLocation.removeEntity(actionEntityName);
         player.addEntity(entity);
         entity.setCurrentLocation(player);
-        return "You put the '" + actionEntityName + "' into your inventory.";
+        return "You put the " + actionEntityName + " into your inventory.";
     }
 
     public void setActionEntityName(String actionEntityName) {

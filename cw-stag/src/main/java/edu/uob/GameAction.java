@@ -35,13 +35,11 @@ abstract public class GameAction {
         }
 
         GameEntityLocation currentLocation = (GameEntityLocation) player.getCurrentLocation();
-        Map<String, GameEntityLocation> locationPaths = currentLocation.getAllowedLocations();
         for (String subject:subjects) {
             if (subject.equals("health")) continue;
             if (subject.equals(currentLocation.getName())) continue;
             if (player.getEntities().containsKey(subject)) continue;
             if (currentLocation.isEntityAvailable(subject)) continue;
-            if (locationPaths.containsKey(subject)) continue;
             return false;
         }
         return true;
