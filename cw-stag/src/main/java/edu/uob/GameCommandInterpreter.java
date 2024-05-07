@@ -56,14 +56,11 @@ public class GameCommandInterpreter {
 
     private Set<String> matchTriggersWithCommand() throws GameException {
         Set<String> matchedTriggers = new HashSet<>();
-        System.out.println(command);
         for (String trigger:model.getActions().keySet()) {
             if (command.contains(" " + trigger + " ")) {
                 matchedTriggers.add(trigger);
             }
-            System.out.println(trigger);
         }
-        for (String str:matchedTriggers) System.out.println(str);
         if(matchedTriggers.isEmpty()) throw new NoMatchedTrigger();
         return matchedTriggers;
     }

@@ -69,6 +69,10 @@ public class GameActionsParser {
         Set<GameAction> lookActionSet = new HashSet<>();
         lookActionSet.add(new GameActionLook());
         gameActions.put("look", lookActionSet);
+
+        Set<GameAction> healthActionSet = new HashSet<>();
+        healthActionSet.add(new GameActionHealth());
+        gameActions.put("health", healthActionSet);
     }
 
     private void checkNameIfReserved(String name) {
