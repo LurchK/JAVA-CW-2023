@@ -1,8 +1,6 @@
 package edu.uob;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GameActionExternal extends GameAction {
     private Set<String> consumed;
@@ -53,10 +51,17 @@ public class GameActionExternal extends GameAction {
         return str.toString();
     }
 
+    @Override
+    public boolean isPossible(GameEntityPlayer player, Set<String> commandEntities) {
+        if (commandEntities.isEmpty()) return false;
+        return super.isPossible(player, commandEntities);
+    }
+
     public String executeAction(GameModel model, GameEntityPlayer player) {
         consume(model, player);
         produce(model, player);
-        return narration;
+        if (player.getHealth() <= 0) return revivePlayer(model, player);
+        else return narration;
     }
 
     private void consume(GameModel model, GameEntityPlayer player) {
@@ -100,5 +105,21 @@ public class GameActionExternal extends GameAction {
             entity.setCurrentLocation(playerLocation);
             playerLocation.addEntity(entity);
         }
+    }
+
+    private String revivePlayer(GameModel model, GameEntityPlayer player) {
+        List<GameEntity> playerEntities = new ArrayList<>(player.getEntities().values());
+        GameEntityLocation currentLocation = (GameEntityLocation) player.getCurrentLocation();
+        for (GameEntity entity:playerEntities) {
+            player.removeEntity(entity.getName());
+            currentLocation.addEntity(entity);
+            entity.setCurrentLocation(currentLocation);
+        }
+
+        currentLocation.removeEntity(player.getName());
+        String startLocation = model.getStartLocation();
+        player.setCurrentLocation(model.getEntities().get(startLocation));
+        player.setHealth(GameEntityPlayer.MAXHEALTH);
+        return narration + "\nYou died and lost all of your items, you must return to the start of the game";
     }
 }

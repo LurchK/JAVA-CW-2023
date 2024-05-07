@@ -4,16 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameEntityPlayer extends GameEntity {
-    private static final int maxHealth = 3;
+    public static final int MAXHEALTH = 3;
     private int health;
     public GameEntityPlayer(String name) {
-        super(name, "A player");
-        health = maxHealth;
+        super(name, "A player with name '" + name + "'");
+        health = MAXHEALTH;
     }
 
     public void setHealth(int health) {
-        if (health > maxHealth) {
-            this.health = maxHealth;
+        if (health > MAXHEALTH) {
+            this.health = MAXHEALTH;
         }
         else if (health < 0) {
             this.health = 0;

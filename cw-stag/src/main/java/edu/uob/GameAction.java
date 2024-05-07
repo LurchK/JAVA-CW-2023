@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-abstract class GameAction {
+abstract public class GameAction {
     private Set<String> triggers;
     private Set<String> subjects;
     public GameAction() {
@@ -28,21 +28,25 @@ abstract class GameAction {
         return subjects;
     }
 
-    public boolean isPossible(GameEntityPlayer player) {
+    public boolean isPossible(GameEntityPlayer player, Set<String> commandEntities) {
+        for (String commandEntity:commandEntities) {
+            if (subjects.contains(commandEntity)) continue;
+            return false;
+        }
+
         GameEntityLocation currentLocation = (GameEntityLocation) player.getCurrentLocation();
         Map<String, GameEntityLocation> locationPaths = currentLocation.getAllowedLocations();
         for (String subject:subjects) {
-            if(subject.equals("health")) continue;
-            if(subject.equals(currentLocation.getName())) continue;
-            if(currentLocation.containsEntity(subject)) continue;
-            if(locationPaths.containsKey(subject)) continue;
-
+            if (subject.equals("health")) continue;
+            if (subject.equals(currentLocation.getName())) continue;
+            if (currentLocation.containsEntity(subject)) continue;
+            if (locationPaths.containsKey(subject)) continue;
             return false;
         }
         return true;
     }
 
-    abstract String executeAction(GameModel model, GameEntityPlayer player);
+    abstract public String executeAction(GameModel model, GameEntityPlayer player);
 
     public String toString() {
         StringBuilder str = new StringBuilder("triggers: ");

@@ -3,7 +3,7 @@ package edu.uob;
 import java.util.HashMap;
 import java.util.Map;
 
-abstract class GameEntity
+abstract public class GameEntity
 {
     private String name;
     private String description;

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class GameActionsParser {
-    private Map<String, Set<GameActionExternal>> gameActions;
+    private Map<String, Set<GameAction>> gameActions;
     private GameActionExternal gameActionExternal;
     private GameModel model;
     private File actionsFile;
@@ -25,6 +25,7 @@ public class GameActionsParser {
     public void parse(GameModel model, File actionsFile) {
         this.model = model;
         this.actionsFile = actionsFile;
+        addBuiltInActions();
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse(actionsFile);
@@ -43,6 +44,31 @@ public class GameActionsParser {
             System.exit(1);
         }
         model.setActions(gameActions);
+    }
+
+    private void addBuiltInActions() {
+        Set<GameAction> invActionSet = new HashSet<>();
+        invActionSet.add(new GameActionInventory());
+        gameActions.put("inv", invActionSet);
+        Set<GameAction> inventoryActionSet = new HashSet<>();
+        inventoryActionSet.add(new GameActionInventory());
+        gameActions.put("inventory", inventoryActionSet);
+
+        Set<GameAction> getActionSet = new HashSet<>();
+        getActionSet.add(new GameActionGet());
+        gameActions.put("get", getActionSet);
+
+        Set<GameAction> dropActionSet = new HashSet<>();
+        dropActionSet.add(new GameActionDrop());
+        gameActions.put("drop", dropActionSet);
+
+        Set<GameAction> gotoActionSet = new HashSet<>();
+        gotoActionSet.add(new GameActionGoto());
+        gameActions.put("goto", gotoActionSet);
+
+        Set<GameAction> lookActionSet = new HashSet<>();
+        lookActionSet.add(new GameActionLook());
+        gameActions.put("look", lookActionSet);
     }
 
     private void checkNameIfReserved(String name) {
@@ -91,9 +117,9 @@ public class GameActionsParser {
                 gameActions.get(trigger).add(gameActionExternal);
             }
             else {
-                Set<GameActionExternal> newSet = new HashSet<>();
-                newSet.add(gameActionExternal);
-                gameActions.put(trigger, newSet);
+                Set<GameAction> newActionSet = new HashSet<>();
+                newActionSet.add(gameActionExternal);
+                gameActions.put(trigger, newActionSet);
             }
         }
     }

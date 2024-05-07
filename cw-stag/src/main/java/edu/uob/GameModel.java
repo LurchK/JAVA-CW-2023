@@ -6,7 +6,7 @@ public class GameModel {
     private List<String> reservedWords;
     private Map<String, GameEntity> entities;
     private String startLocation;
-    private Map<String, Set<GameActionExternal>> actions;
+    private Map<String, Set<GameAction>> actions;
 
     public GameModel() {
         reservedWords = new LinkedList<>(Arrays.asList("inventory","inv","get","drop","goto","look"));
@@ -19,7 +19,7 @@ public class GameModel {
         this.entities = entities;
     }
 
-    public void setActions(Map<String, Set<GameActionExternal>> actions) {
+    public void setActions(Map<String, Set<GameAction>> actions) {
         this.actions = actions;
     }
 
@@ -31,7 +31,7 @@ public class GameModel {
         return entities;
     }
 
-    public Map<String, Set<GameActionExternal>> getActions() {
+    public Map<String, Set<GameAction>> getActions() {
         return actions;
     }
 
