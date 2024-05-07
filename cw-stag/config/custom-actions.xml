@@ -23,13 +23,16 @@
             <keyphrase>unlock</keyphrase>
         </triggers>
         <subjects>
-            <entity>door</entity>
+            <entity>lockeddoor</entity>
+            <entity>cabin</entity>
             <entity>key</entity>
         </subjects>
         <consumed>
+            <entity>lockeddoor</entity>
         </consumed>
         <produced>
             <entity>storeroom</entity>
+            <entity>unlockeddoor</entity>
         </produced>
         <narration>You unlock the door and can now goto the storeroom</narration>
     </action>
@@ -39,33 +42,18 @@
             <keyphrase>lock</keyphrase>
         </triggers>
         <subjects>
-            <entity>door</entity>
-            <entity>storeroom</entity>
+            <entity>unlockeddoor</entity>
+            <entity>cabin</entity>
             <entity>key</entity>
         </subjects>
         <consumed>
             <entity>storeroom</entity>
+            <entity>unlockeddoor</entity>
         </consumed>
         <produced>
+            <entity>lockeddoor</entity>
         </produced>
         <narration>You locked the door to the storeroom</narration>
-    </action>
-
-    <action>
-        <triggers>
-            <keyphrase>lock</keyphrase>
-        </triggers>
-        <subjects>
-            <entity>door</entity>
-            <entity>cabin</entity>
-            <entity>key</entity>
-        </subjects>
-        <consumed>
-            <entity>cabin</entity>
-        </consumed>
-        <produced>
-        </produced>
-        <narration>You locked the door to the cabin</narration>
     </action>
 
     <action>

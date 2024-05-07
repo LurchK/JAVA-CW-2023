@@ -18,7 +18,7 @@ digraph layout {
             }
             subgraph furniture {
                 node [shape = "hexagon"];
-                door [description = "A locked door to storeroom"]
+                lockeddoor [description = "A locked door to storeroom"]
                 trapdoor [description = "A locked wooden trapdoor in the floor"];
             }
         }
@@ -83,6 +83,7 @@ digraph layout {
             subgraph furniture {
                 node [shape = "hexagon"];
                 hole [description = "A deep hole in the ground"];
+                unlockeddoor [description = "An unlocked door to storeroom"]
             }
         }
 
