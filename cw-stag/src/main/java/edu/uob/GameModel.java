@@ -38,4 +38,8 @@ public class GameModel {
     public String getStartLocation() {
         return startLocation;
     }
+
+    public List<String> getReservedWords() {
+        return reservedWords;
+    }
 }

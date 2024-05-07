@@ -39,8 +39,20 @@ public final class GameServer {
     * @param command The incoming command to be processed
     */
     public String handleCommand(String command) {
-        // TODO implement your server logic here
-        return "";
+        command = command.toLowerCase();
+        int colonIndex = command.indexOf(":");
+        String playerName = command.substring(0, colonIndex);
+        command = command.substring(colonIndex+1);
+
+        String message = "";
+        GameCommandInterpreter interpreter = new GameCommandInterpreter();
+        try {
+            message = interpreter.interp(model, playerName, command);
+        }
+        catch (GameException e) {
+            message = e.getMessage();
+        }
+        return message;
     }
 
     /**

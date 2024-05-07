@@ -1,19 +1,15 @@
 package edu.uob;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-public class GameAction {
+abstract public class GameAction {
     private Set<String> triggers;
     private Set<String> subjects;
-    private Set<String> consumed;
-    private Set<String> produced;
-    private String narration;
     public GameAction() {
         triggers = new HashSet<>();
         subjects = new HashSet<>();
-        consumed = new HashSet<>();
-        produced = new HashSet<>();
     }
 
     public void addTrigger(String trigger) {
@@ -24,18 +20,6 @@ public class GameAction {
         subjects.add(subject);
     }
 
-    public void addConsumed(String entity) {
-        consumed.add(entity);
-    }
-
-    public void addProduced(String entity) {
-        produced.add(entity);
-    }
-
-    public void setNarration(String narration) {
-        this.narration = narration;
-    }
-
     public Set<String> getTriggers() {
         return triggers;
     }
@@ -44,17 +28,25 @@ public class GameAction {
         return subjects;
     }
 
-    public Set<String> getConsumed() {
-        return consumed;
+    public boolean isPossible(GameEntityPlayer player, Set<String> commandEntities) {
+        for (String commandEntity:commandEntities) {
+            if (subjects.contains(commandEntity)) continue;
+            return false;
+        }
+
+        GameEntityLocation currentLocation = (GameEntityLocation) player.getCurrentLocation();
+        Map<String, GameEntityLocation> locationPaths = currentLocation.getAllowedLocations();
+        for (String subject:subjects) {
+            if (subject.equals("health")) continue;
+            if (subject.equals(currentLocation.getName())) continue;
+            if (currentLocation.containsEntity(subject)) continue;
+            if (locationPaths.containsKey(subject)) continue;
+            return false;
+        }
+        return true;
     }
 
-    public Set<String> getProduced() {
-        return produced;
-    }
-
-    public String getNarration() {
-        return narration;
-    }
+    abstract public String executeAction(GameModel model, GameEntityPlayer player);
 
     public String toString() {
         StringBuilder str = new StringBuilder("triggers: ");
@@ -65,15 +57,6 @@ public class GameAction {
         for (String s:subjects) {
             str.append("'").append(s).append("' ");
         }
-        str.append("\nconsumed: ");
-        for (String s:consumed) {
-            str.append("'").append(s).append("' ");
-        }
-        str.append("\nproduced: ");
-        for (String s:produced) {
-            str.append("'").append(s).append("' ");
-        }
-        str.append("\nnarration: ").append(narration);
         return str.toString();
     }
 }
