@@ -96,6 +96,7 @@ public class GameActionExternal extends GameAction {
             GameEntity entity = model.getEntities().get(entityName);
             GameEntityLocation playerLocation = (GameEntityLocation) player.getCurrentLocation();
             if (entity instanceof GameEntityLocation destination) {
+                if (entity == playerLocation) continue;
                 playerLocation.addAllowedLocation(destination);
                 continue;
             }

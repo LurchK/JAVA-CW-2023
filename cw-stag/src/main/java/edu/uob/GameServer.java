@@ -11,15 +11,15 @@ public final class GameServer {
     GameModel model;
 
     public static void main(String[] args) throws IOException {
-        File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
-        File actionsFile = Paths.get("config" + File.separator + "basic-actions.xml").toAbsolutePath().toFile();
+        File entitiesFile = Paths.get("config" + File.separator + "extended-entities.dot").toAbsolutePath().toFile();
+        File actionsFile = Paths.get("config" + File.separator + "extended-actions.xml").toAbsolutePath().toFile();
         GameServer server = new GameServer(entitiesFile, actionsFile);
         server.blockingListenOn(8888);
     }
 
     /**
     * Do not change the following method signature or we won't be able to mark your submission
-    * Instanciates a new server instance, specifying a game with some configuration files
+    * Instantiates a new server instance, specifying a game with some configuration files
     *
     * @param entitiesFile The game configuration file containing all game entities to use in your game
     * @param actionsFile The game configuration file containing all game actions to use in your game
@@ -44,7 +44,7 @@ public final class GameServer {
         String playerName = command.substring(0, colonIndex);
         command = command.substring(colonIndex+1);
 
-        String message = "";
+        String message;
         GameCommandInterpreter interpreter = new GameCommandInterpreter();
         try {
             message = interpreter.interp(model, playerName, command);
