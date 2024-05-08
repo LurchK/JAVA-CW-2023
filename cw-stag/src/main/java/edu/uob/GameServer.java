@@ -49,7 +49,7 @@ public final class GameServer {
         try {
             message = interpreter.interp(model, playerName, command);
         }
-        catch (GameException e) {
+        catch (Exception e) {
             message = e.getMessage();
         }
         return message;

@@ -22,6 +22,9 @@ public class GameActionGoto extends GameAction {
 
     public String executeAction(GameModel model, GameEntityPlayer player) {
         GameEntityLocation currentLocation = (GameEntityLocation) player.getCurrentLocation();
+        if (actionEntityName.equals(currentLocation.getName())) {
+            return "You are already in the target location.";
+        }
         if (currentLocation.getAllowedLocations().containsKey(actionEntityName)) {
             GameEntityLocation destination = currentLocation.getAllowedLocations().get(actionEntityName);
             player.setCurrentLocation(destination);

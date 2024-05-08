@@ -118,8 +118,10 @@ public class GameActionExternal extends GameAction {
         }
 
         currentLocation.removeEntity(player.getName());
-        String startLocation = model.getStartLocation();
-        player.setCurrentLocation(model.getEntities().get(startLocation));
+        String startLocationName = model.getStartLocation();
+        GameEntityLocation startLocationEntity = (GameEntityLocation) model.getEntities().get(startLocationName);
+        player.setCurrentLocation(startLocationEntity);
+        startLocationEntity.addEntity(player);
         player.setHealth(GameEntityPlayer.MAXHEALTH);
         return narration + "\nYou died and lost all of your items, you must return to the start of the game";
     }
