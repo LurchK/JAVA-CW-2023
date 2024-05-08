@@ -34,11 +34,7 @@ public class GameCommandInterpreter {
         }
     }
 
-    private GameEntityPlayer createNewPlayer(String playerName) throws GameException {
-        if(model.getReservedWords().contains(playerName)) {
-            throw new PlayerNameIsReservedKeyword(playerName);
-        }
-        
+    private GameEntityPlayer createNewPlayer(String playerName) {
         Map<String, GameEntity> entities = model.getEntities();
         String startLocationName = model.getStartLocation();
         GameEntityLocation startLocationEntity = (GameEntityLocation) entities.get(startLocationName);
